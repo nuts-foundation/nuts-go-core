@@ -10,7 +10,7 @@ Common resources for Nuts Go modules.
 .. image:: https://codecov.io/gh/nuts-foundation/nuts-go-core/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/nuts-foundation/nuts-go-core
 
-.. image:: https://api.codacy.com/project/badge/Grade/272258ac93e847b9b61c08d4144d0538
+.. image:: https://api.codacy.com/project/badge/Grade/52505af856204732ba9fc5b0d4cbe71e
     :target: https://www.codacy.com/app/woutslakhorst/nuts-go-core
 
 Building
