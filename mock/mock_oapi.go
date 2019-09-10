@@ -6,7 +6,7 @@ package mock
 
 import (
 	gomock "github.com/golang/mock/gomock"
-	echo "github.com/labstack/echo"
+	v4 "github.com/labstack/echo/v4"
 	reflect "reflect"
 )
 
@@ -34,14 +34,14 @@ func (m *MockEchoRouter) EXPECT() *MockEchoRouterMockRecorder {
 }
 
 // CONNECT mocks base method
-func (m *MockEchoRouter) CONNECT(arg0 string, arg1 echo.HandlerFunc, arg2 ...echo.MiddlewareFunc) *echo.Route {
+func (m *MockEchoRouter) CONNECT(arg0 string, arg1 v4.HandlerFunc, arg2 ...v4.MiddlewareFunc) *v4.Route {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "CONNECT", varargs...)
-	ret0, _ := ret[0].(*echo.Route)
+	ret0, _ := ret[0].(*v4.Route)
 	return ret0
 }
 
@@ -53,14 +53,14 @@ func (mr *MockEchoRouterMockRecorder) CONNECT(arg0, arg1 interface{}, arg2 ...in
 }
 
 // DELETE mocks base method
-func (m *MockEchoRouter) DELETE(arg0 string, arg1 echo.HandlerFunc, arg2 ...echo.MiddlewareFunc) *echo.Route {
+func (m *MockEchoRouter) DELETE(arg0 string, arg1 v4.HandlerFunc, arg2 ...v4.MiddlewareFunc) *v4.Route {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "DELETE", varargs...)
-	ret0, _ := ret[0].(*echo.Route)
+	ret0, _ := ret[0].(*v4.Route)
 	return ret0
 }
 
@@ -72,14 +72,14 @@ func (mr *MockEchoRouterMockRecorder) DELETE(arg0, arg1 interface{}, arg2 ...int
 }
 
 // GET mocks base method
-func (m *MockEchoRouter) GET(arg0 string, arg1 echo.HandlerFunc, arg2 ...echo.MiddlewareFunc) *echo.Route {
+func (m *MockEchoRouter) GET(arg0 string, arg1 v4.HandlerFunc, arg2 ...v4.MiddlewareFunc) *v4.Route {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GET", varargs...)
-	ret0, _ := ret[0].(*echo.Route)
+	ret0, _ := ret[0].(*v4.Route)
 	return ret0
 }
 
@@ -91,14 +91,14 @@ func (mr *MockEchoRouterMockRecorder) GET(arg0, arg1 interface{}, arg2 ...interf
 }
 
 // HEAD mocks base method
-func (m *MockEchoRouter) HEAD(arg0 string, arg1 echo.HandlerFunc, arg2 ...echo.MiddlewareFunc) *echo.Route {
+func (m *MockEchoRouter) HEAD(arg0 string, arg1 v4.HandlerFunc, arg2 ...v4.MiddlewareFunc) *v4.Route {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "HEAD", varargs...)
-	ret0, _ := ret[0].(*echo.Route)
+	ret0, _ := ret[0].(*v4.Route)
 	return ret0
 }
 
@@ -110,14 +110,14 @@ func (mr *MockEchoRouterMockRecorder) HEAD(arg0, arg1 interface{}, arg2 ...inter
 }
 
 // OPTIONS mocks base method
-func (m *MockEchoRouter) OPTIONS(arg0 string, arg1 echo.HandlerFunc, arg2 ...echo.MiddlewareFunc) *echo.Route {
+func (m *MockEchoRouter) OPTIONS(arg0 string, arg1 v4.HandlerFunc, arg2 ...v4.MiddlewareFunc) *v4.Route {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "OPTIONS", varargs...)
-	ret0, _ := ret[0].(*echo.Route)
+	ret0, _ := ret[0].(*v4.Route)
 	return ret0
 }
 
@@ -129,14 +129,14 @@ func (mr *MockEchoRouterMockRecorder) OPTIONS(arg0, arg1 interface{}, arg2 ...in
 }
 
 // PATCH mocks base method
-func (m *MockEchoRouter) PATCH(arg0 string, arg1 echo.HandlerFunc, arg2 ...echo.MiddlewareFunc) *echo.Route {
+func (m *MockEchoRouter) PATCH(arg0 string, arg1 v4.HandlerFunc, arg2 ...v4.MiddlewareFunc) *v4.Route {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "PATCH", varargs...)
-	ret0, _ := ret[0].(*echo.Route)
+	ret0, _ := ret[0].(*v4.Route)
 	return ret0
 }
 
@@ -148,14 +148,14 @@ func (mr *MockEchoRouterMockRecorder) PATCH(arg0, arg1 interface{}, arg2 ...inte
 }
 
 // POST mocks base method
-func (m *MockEchoRouter) POST(arg0 string, arg1 echo.HandlerFunc, arg2 ...echo.MiddlewareFunc) *echo.Route {
+func (m *MockEchoRouter) POST(arg0 string, arg1 v4.HandlerFunc, arg2 ...v4.MiddlewareFunc) *v4.Route {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "POST", varargs...)
-	ret0, _ := ret[0].(*echo.Route)
+	ret0, _ := ret[0].(*v4.Route)
 	return ret0
 }
 
@@ -167,14 +167,14 @@ func (mr *MockEchoRouterMockRecorder) POST(arg0, arg1 interface{}, arg2 ...inter
 }
 
 // PUT mocks base method
-func (m *MockEchoRouter) PUT(arg0 string, arg1 echo.HandlerFunc, arg2 ...echo.MiddlewareFunc) *echo.Route {
+func (m *MockEchoRouter) PUT(arg0 string, arg1 v4.HandlerFunc, arg2 ...v4.MiddlewareFunc) *v4.Route {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "PUT", varargs...)
-	ret0, _ := ret[0].(*echo.Route)
+	ret0, _ := ret[0].(*v4.Route)
 	return ret0
 }
 
@@ -186,14 +186,14 @@ func (mr *MockEchoRouterMockRecorder) PUT(arg0, arg1 interface{}, arg2 ...interf
 }
 
 // TRACE mocks base method
-func (m *MockEchoRouter) TRACE(arg0 string, arg1 echo.HandlerFunc, arg2 ...echo.MiddlewareFunc) *echo.Route {
+func (m *MockEchoRouter) TRACE(arg0 string, arg1 v4.HandlerFunc, arg2 ...v4.MiddlewareFunc) *v4.Route {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "TRACE", varargs...)
-	ret0, _ := ret[0].(*echo.Route)
+	ret0, _ := ret[0].(*v4.Route)
 	return ret0
 }
 
