@@ -37,7 +37,7 @@ Then run
 .. code-block:: shell
 
    mockgen -destination=mock/mock_oapi.go -package=mock github.com/deepmap/oapi-codegen/pkg/runtime EchoRouter
-   mockgen -destination=mock/mock_echo.go -package=mock github.com/labstack/echo Context
+   mockgen -destination=mock/mock_echo.go -package=mock github.com/labstack/echo/v4 Context
 
 Testing
 -------
