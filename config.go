@@ -196,9 +196,13 @@ func (ngc *NutsGlobalConfig) loadConfigFile() error {
 
 	// if file can not be found, print to stderr and continue
 	err := ngc.v.ReadInConfig()
-	if err != nil && err.Error() == fmt.Sprintf("open %s: no such file or directory", configFile) {
-		fmt.Fprintf(os.Stderr, "Config file %s not found, using defaults!\n", configFile)
-		return nil
+	if err != nil {
+		var pathError *os.PathError
+		// error on opening file
+		if errors.As(err, &pathError) && pathError.Op == "open" {
+			fmt.Fprintf(os.Stderr, "Config file %s not found, using defaults!\n", configFile)
+			return nil
+		}
 	}
 	return err
 }
@@ -227,7 +231,7 @@ func (ngc *NutsGlobalConfig) InjectIntoEngine(e *Engine) error {
 				field, err = ngc.findField(e, ngc.fieldName(e, f.Name))
 
 				if err != nil {
-					err = errors.New(fmt.Sprintf("Problem injecting [%v] for %s: %s", configName, e.Name, err.Error()))
+					err = fmt.Errorf("problem injecting [%v] for %s: %w", configName, e.Name, err)
 					return
 				}
 
@@ -235,7 +239,7 @@ func (ngc *NutsGlobalConfig) InjectIntoEngine(e *Engine) error {
 				var val interface{}
 				val = ngc.v.Get(configName)
 				if val == nil {
-					err = errors.New(fmt.Sprintf("Nil value for %v, forgot to add flag binding?", configName))
+					err = fmt.Errorf("nil value for %v, forgot to add flag binding", configName)
 					return
 				}
 
@@ -254,7 +258,7 @@ func (ngc *NutsGlobalConfig) InjectIntoEngine(e *Engine) error {
 				}
 
 				if val == nil {
-					err = errors.New(fmt.Sprintf("Nil value for %v, forgot to add flag binding?", configName))
+					err = fmt.Errorf("nil value for %v, forgot to add flag binding", configName)
 					return
 				}
 
@@ -282,7 +286,7 @@ func (ngc *NutsGlobalConfig) injectIntoStruct(s interface{}) error {
 		field, err = ngc.findFieldInStruct(&sv, configName)
 
 		if err != nil {
-			return errors.New(fmt.Sprintf("Problem injecting [%v]: %s", configName, err.Error()))
+			return fmt.Errorf("problem injecting [%v]: %w", configName, err)
 		}
 
 		// inject value
@@ -378,14 +382,17 @@ func (ngc *NutsGlobalConfig) findField(e *Engine, fieldName string) (*reflect.Va
 	return ngc.findFieldInStruct(&cfgP, fieldName)
 }
 
+var ErrInvalidConfigTarget = errors.New("only struct pointers are supported to be a config target")
+var ErrUnMutableConfigTarget = errors.New("given Engine.Config can not be altered")
+
 func (ngc *NutsGlobalConfig) findFieldInStruct(cfgP *reflect.Value, configName string) (*reflect.Value, error) {
 	if cfgP.Kind() != reflect.Ptr {
-		return nil, errors.New("Only struct pointers are supported to be a Config target")
+		return nil, ErrInvalidConfigTarget
 	}
 
 	s := cfgP.Elem()
 	if !s.CanSet() {
-		return nil, errors.New("Given Engine.Config can not be Altered")
+		return nil, ErrUnMutableConfigTarget
 	}
 
 	spl := strings.Split(configName, ngc.Delimiter)
@@ -401,10 +408,10 @@ func (ngc *NutsGlobalConfig) findFieldRecursive(s *reflect.Value, names []string
 	field := s.FieldByName(t)
 	switch field.Kind() {
 	case reflect.Invalid:
-		return nil, errors.New(fmt.Sprintf("inaccessible or invalid field [%v] in %v", t, s.Type()))
+		return nil, fmt.Errorf("inaccessible or invalid field [%v] in %v", t, s.Type())
 	case reflect.Struct:
 		if len(tail) == 0 {
-			return nil, errors.New(fmt.Sprintf("incompatible source/target, trying to set value to struct target: %v to %v", strings.Title(head), field.Type()))
+			return nil, fmt.Errorf("incompatible source/target, trying to set value to struct target: %v to %v", strings.Title(head), field.Type())
 		}
 		return ngc.findFieldRecursive(&field, tail)
 	case reflect.Map:
@@ -412,12 +419,12 @@ func (ngc *NutsGlobalConfig) findFieldRecursive(s *reflect.Value, names []string
 	default:
 		if len(tail) > 0 {
 			n := fmt.Sprintf("%s.%s", head, strings.Join(tail, "."))
-			return nil, errors.New(fmt.Sprintf("incompatible source/target, deeper nested key than target %s", n))
+			return nil, fmt.Errorf("incompatible source/target, deeper nested key than target %s", n)
 		}
 	}
 
 	if !field.CanSet() {
-		return nil, errors.New(fmt.Sprintf("Field %v can not be Set", t))
+		return nil, fmt.Errorf("field %v can not be Set", t)
 	}
 
 	return &field, nil

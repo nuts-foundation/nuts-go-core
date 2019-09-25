@@ -18,7 +18,7 @@ Building
 
 .. note::
 
-    Nuts-go uses Go version > `1.12.x` and go modules.
+    Nuts-go uses Go version >= `1.13`.
 
 .. code-block:: shell
 
