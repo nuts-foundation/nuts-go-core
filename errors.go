@@ -22,12 +22,13 @@ package core
 import (
 	"errors"
 	"fmt"
+	"net"
 )
 
 // Error is the interface that extends the default error interface
 type Error interface {
 	error
-	IsRecoverable() bool
+	Recoverable() bool // can the same operation succeed at a later moment?
 }
 
 // NutsError is the main implementation adding a recoverable field to an error.
@@ -46,18 +47,31 @@ func NewError(msg string, recoverable bool) Error {
 }
 
 // Errorf creates a new NutsError with given format and values
-func Errorf(format string, recoverable bool, a ...interface{}) error {
+func Errorf(format string, recoverable bool, a ...interface{}) Error {
 	return &NutsError{
 		err:         fmt.Errorf(format, a...),
 		recoverable: recoverable,
 	}
 }
 
+// Wrap tries to identify the error and sets recoverable
+func Wrap(err error) Error {
+	var recoverable bool
+
+	// net.Error interface
+	var netError net.Error
+	if errors.As(err, &netError) {
+		recoverable = true
+	}
+
+	return Errorf("%w", recoverable, err)
+}
+
 func (ne *NutsError) Error() string {
 	return ne.err.Error()
 }
 
-func (ne *NutsError) IsRecoverable() bool {
+func (ne *NutsError) Recoverable() bool {
 	return ne.recoverable
 }
 

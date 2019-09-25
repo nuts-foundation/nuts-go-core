@@ -126,3 +126,18 @@ func TestNutsError_Is(t *testing.T) {
 		}
 	})
 }
+
+type errTimeout struct{}
+func (e *errTimeout) Error() string { return "error" }
+func (e *errTimeout) Timeout() bool { return true }
+func (e *errTimeout) Temporary() bool { return true }
+
+func TestWrap(t *testing.T) {
+	t.Run("Wrap returns recoverable error for Timeout error", func(t *testing.T) {
+		e := Wrap(&errTimeout{})
+
+		if !e.Recoverable() {
+			t.Error("Expected timeout error to be recoverable")
+		}
+	})
+}
