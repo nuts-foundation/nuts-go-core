@@ -33,22 +33,22 @@ type Error interface {
 // NutsError is the main implementation adding a recoverable field to an error.
 // This field will tell if the error is definitive or can be retried at a later moment.
 type NutsError struct {
-	err error
+	err         error
 	recoverable bool
 }
 
 // NewError is a convenience method for creating a simple error
 func NewError(msg string, recoverable bool) Error {
 	return &NutsError{
-		err:   errors.New(msg),
+		err:         errors.New(msg),
 		recoverable: recoverable,
 	}
 }
 
 // Errorf creates a new NutsError with given format and values
 func Errorf(format string, recoverable bool, a ...interface{}) error {
-	return &NutsError {
-		err: fmt.Errorf(format, a...),
+	return &NutsError{
+		err:         fmt.Errorf(format, a...),
 		recoverable: recoverable,
 	}
 }

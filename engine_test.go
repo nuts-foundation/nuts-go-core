@@ -30,7 +30,6 @@ func TestRegisterEngine(t *testing.T) {
 		}
 		ctl.registerEngine(&Engine{})
 
-
 		if len(ctl.Engines) != 1 {
 			t.Errorf("Expected 1 registered engine, Got %d", len(ctl.Engines))
 		}

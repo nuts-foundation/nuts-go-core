@@ -80,7 +80,7 @@ func TestNutsError_As(t *testing.T) {
 
 		var nutsError *NutsError
 
-		if !errors.As(e, &nutsError)  {
+		if !errors.As(e, &nutsError) {
 			t.Error("expected NutsError to be able to be type casted")
 		}
 	})
@@ -95,7 +95,7 @@ func TestNutsError_UnWrap(t *testing.T) {
 		var nutsError *NutsError
 		errors.As(e, &nutsError)
 
-		if nutsError.UnWrap().Error() != "catastrophic failure"  {
+		if nutsError.UnWrap().Error() != "catastrophic failure" {
 			t.Error("expected Unwrapped error to equals [catastrophic failure]")
 		}
 	})
