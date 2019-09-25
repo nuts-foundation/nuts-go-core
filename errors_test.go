@@ -140,4 +140,12 @@ func TestWrap(t *testing.T) {
 			t.Error("Expected timeout error to be recoverable")
 		}
 	})
+
+	t.Run("Wrap returns non-recoverable error by default", func(t *testing.T) {
+		e := Wrap(errors.New("error"))
+
+		if e.Recoverable() {
+			t.Error("Expected normal error to be non-recoverable")
+		}
+	})
 }

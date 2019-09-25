@@ -64,6 +64,8 @@ func Wrap(err error) Error {
 		recoverable = true
 	}
 
+	// json.SyntaxError is not recoverable
+
 	return Errorf("%w", recoverable, err)
 }
 
