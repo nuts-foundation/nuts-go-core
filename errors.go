@@ -30,7 +30,7 @@ type Error interface {
 	error
 
 	// Recoverable indicates if an action which resulted in the error can be retried
-	Recoverable() bool // can the same operation succeed at a later moment?
+	Recoverable() bool
 }
 
 // NutsEventError is the main implementation adding a recoverable field to an error.
@@ -75,6 +75,7 @@ func (ne *NutsEventError) Error() string {
 	return ne.err.Error()
 }
 
+// Recoverable indicates if an action which resulted in the error can be retried
 func (ne *NutsEventError) Recoverable() bool {
 	return ne.recoverable
 }
