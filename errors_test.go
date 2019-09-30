@@ -78,10 +78,10 @@ func TestNutsError_As(t *testing.T) {
 
 		e := Errorf(format, false, cause)
 
-		var nutsError *NutsError
+		var nutsError *NutsEventError
 
 		if !errors.As(e, &nutsError) {
-			t.Error("expected NutsError to be able to be type casted")
+			t.Error("expected NutsEventError to be able to be type casted")
 		}
 	})
 }
@@ -92,7 +92,7 @@ func TestNutsError_UnWrap(t *testing.T) {
 		cause := errors.New("catastrophic failure")
 
 		e := Errorf(format, false, cause)
-		var nutsError *NutsError
+		var nutsError *NutsEventError
 		errors.As(e, &nutsError)
 
 		if nutsError.UnWrap().Error() != "catastrophic failure" {
@@ -118,7 +118,7 @@ func TestNutsError_Is(t *testing.T) {
 		cause := errors.New("catastrophic failure")
 
 		e := Errorf(format, false, cause)
-		var nutsError *NutsError
+		var nutsError *NutsEventError
 		errors.As(e, &nutsError)
 
 		if !nutsError.Is(cause) {

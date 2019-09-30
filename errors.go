@@ -33,24 +33,24 @@ type Error interface {
 	Recoverable() bool // can the same operation succeed at a later moment?
 }
 
-// NutsError is the main implementation adding a recoverable field to an error.
+// NutsEventError is the main implementation adding a recoverable field to an error.
 // This field will tell if the error is definitive or can be retried at a later moment.
-type NutsError struct {
+type NutsEventError struct {
 	err         error
 	recoverable bool
 }
 
 // NewError is a convenience method for creating a simple error
 func NewError(msg string, recoverable bool) Error {
-	return &NutsError{
+	return &NutsEventError{
 		err:         errors.New(msg),
 		recoverable: recoverable,
 	}
 }
 
-// Errorf creates a new NutsError with given format and values
+// Errorf creates a new NutsEventError with given format and values
 func Errorf(format string, recoverable bool, a ...interface{}) Error {
-	return &NutsError{
+	return &NutsEventError{
 		err:         fmt.Errorf(format, a...),
 		recoverable: recoverable,
 	}
@@ -71,20 +71,20 @@ func Wrap(err error) Error {
 	return Errorf("%w", recoverable, err)
 }
 
-func (ne *NutsError) Error() string {
+func (ne *NutsEventError) Error() string {
 	return ne.err.Error()
 }
 
-func (ne *NutsError) Recoverable() bool {
+func (ne *NutsEventError) Recoverable() bool {
 	return ne.recoverable
 }
 
 // Is is a wrapper for errors.Is()
-func (ne *NutsError) Is(target error) bool {
+func (ne *NutsEventError) Is(target error) bool {
 	return errors.Is(ne.err, target)
 }
 
-// UnWrap is needed for NutsError to be UnWrapped
-func (ne NutsError) UnWrap() error {
+// UnWrap is needed for NutsEventError to be UnWrapped
+func (ne NutsEventError) UnWrap() error {
 	return errors.Unwrap(ne.err)
 }
