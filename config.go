@@ -418,7 +418,7 @@ func (ngc *NutsGlobalConfig) findFieldRecursive(s *reflect.Value, names []string
 		}
 		return ngc.findFieldRecursive(&field, tail)
 	case reflect.Map:
-		return nil, errors.New(fmt.Sprintf("Map values not supported in %v", field.Type()))
+		return nil, fmt.Errorf("Map values not supported in %v", field.Type())
 	default:
 		if len(tail) > 0 {
 			n := fmt.Sprintf("%s.%s", head, strings.Join(tail, "."))
