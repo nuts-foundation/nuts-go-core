@@ -28,6 +28,8 @@ import (
 // Error is the interface that extends the default error interface
 type Error interface {
 	error
+
+	// Recoverable indicates if an action which resulted in the error can be retried
 	Recoverable() bool // can the same operation succeed at a later moment?
 }
 
@@ -82,7 +84,7 @@ func (ne *NutsError) Is(target error) bool {
 	return errors.Is(ne.err, target)
 }
 
-// Unwrap makes the error unwrappable
+// UnWrap is needed for NutsError to be UnWrapped
 func (ne NutsError) UnWrap() error {
 	return errors.Unwrap(ne.err)
 }

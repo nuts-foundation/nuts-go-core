@@ -382,7 +382,10 @@ func (ngc *NutsGlobalConfig) findField(e *Engine, fieldName string) (*reflect.Va
 	return ngc.findFieldInStruct(&cfgP, fieldName)
 }
 
+// ErrInvalidConfigTarget is an error used for invalid config target pointers
 var ErrInvalidConfigTarget = errors.New("only struct pointers are supported to be a config target")
+
+// ErrUnMutableConfigTarget is an error used when a struct member is accessible
 var ErrUnMutableConfigTarget = errors.New("given Engine.Config can not be altered")
 
 func (ngc *NutsGlobalConfig) findFieldInStruct(cfgP *reflect.Value, configName string) (*reflect.Value, error) {
