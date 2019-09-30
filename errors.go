@@ -20,6 +20,7 @@
 package core
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -63,6 +64,11 @@ func Wrap(err error) Error {
 	// net.Error interface
 	var netError net.Error
 	if errors.As(err, &netError) {
+		recoverable = true
+	}
+
+	// context.Deadline, or client side timeout
+	if errors.Is(err, context.DeadlineExceeded) {
 		recoverable = true
 	}
 

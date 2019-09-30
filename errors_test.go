@@ -20,6 +20,7 @@
 package core
 
 import (
+	"context"
 	"errors"
 	"testing"
 )
@@ -138,6 +139,14 @@ func TestWrap(t *testing.T) {
 
 		if !e.Recoverable() {
 			t.Error("Expected timeout error to be recoverable")
+		}
+	})
+
+	t.Run("Wrap returns recoverable error for context deadline", func(t *testing.T) {
+		e := Wrap(context.DeadlineExceeded)
+
+		if !e.Recoverable() {
+			t.Error("Expected deadline error to be recoverable")
 		}
 	})
 
