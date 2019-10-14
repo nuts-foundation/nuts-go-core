@@ -319,7 +319,7 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 			return
 		}
 
-		expected := "Problem injecting [key]: Only struct pointers are supported to be a Config target"
+		expected := "problem injecting [key]: only struct pointers are supported to be a config target"
 		if err.Error() != expected {
 			t.Errorf("Expected error [%s], got [%v]", expected, err.Error())
 		}
@@ -339,7 +339,7 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 			return
 		}
 
-		expected := "Problem injecting [key]: Map values not supported in map[string]string"
+		expected := "problem injecting [key]: Map values not supported in map[string]string"
 		if err.Error() != expected {
 			t.Errorf("Expected error [%s], got [%v]", expected, err.Error())
 		}
@@ -355,7 +355,7 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 			return
 		}
 
-		expected := "Problem injecting [key]: inaccessible or invalid field [Key] in struct {}"
+		expected := "problem injecting [key]: inaccessible or invalid field [Key] in struct {}"
 		if err.Error() != expected {
 			t.Errorf("Expected error [%s], got [%v]", expected, err)
 		}
@@ -375,7 +375,7 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 			return
 		}
 
-		expected := "Problem injecting [key]: inaccessible or invalid field [Key] in struct { key string }"
+		expected := "problem injecting [key]: inaccessible or invalid field [Key] in struct { key string }"
 		if err.Error() != expected {
 			t.Errorf("Expected error [%s], got [%v]", expected, err)
 		}
@@ -528,7 +528,7 @@ func TestNutsGlobalConfig_InjectIntoEngine(t *testing.T) {
 			t.Errorf("Expected error, got nothing")
 		}
 
-		expected := "Problem injecting [key] for test: inaccessible or invalid field [Key] in struct { key string }"
+		expected := "problem injecting [key] for test: inaccessible or invalid field [Key] in struct { key string }"
 		if err.Error() != expected {
 			t.Errorf("Expected error [%s], got [%v]", expected, err.Error())
 		}
@@ -552,7 +552,7 @@ func TestNutsGlobalConfig_InjectIntoEngine(t *testing.T) {
 			t.Errorf("Expected error, got nothing")
 		}
 
-		expected := "Nil value for nested.key, forgot to add flag binding?"
+		expected := "nil value for nested.key, forgot to add flag binding"
 		if err.Error() != expected {
 			t.Errorf("Expected error [%s], got [%v]", expected, err.Error())
 		}
@@ -576,7 +576,7 @@ func TestNutsGlobalConfig_InjectIntoEngine(t *testing.T) {
 			t.Errorf("Expected error, got nothing")
 		}
 
-		expected := "Problem injecting [nested.key] for : incompatible source/target, deeper nested key than target nested.key"
+		expected := "problem injecting [nested.key] for : incompatible source/target, deeper nested key than target nested.key"
 		if err.Error() != expected {
 			t.Errorf("Expected error [%s], got [%v]", expected, err.Error())
 		}
