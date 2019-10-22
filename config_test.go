@@ -25,6 +25,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"reflect"
 	"strings"
@@ -138,6 +139,17 @@ func TestNutsGlobalConfig_Load2(t *testing.T) {
 		if err.Error() != expected {
 			t.Errorf("Expected error [%s], got [%v]", expected, err)
 		}
+	})
+
+	t.Run("Returns error for incorrect environment", func(t *testing.T) {
+		os.Args = []string{"command", "--environment", "staging"}
+		cfg := NewNutsGlobalConfig()
+
+		err := cfg.Load(&cobra.Command{})
+
+		assert.Error(t, err)
+		expected := "invalid value for environment flag: staging. Allowed values: [production, development]"
+		assert.EqualError(t, err, expected)
 	})
 }
 

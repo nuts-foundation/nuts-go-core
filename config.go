@@ -41,6 +41,8 @@ const loggerLevelFlag = "verbosity"
 const addressFlag = "address"
 const defaultLogLevel = "info"
 const defaultAddress = "localhost:1323"
+const defaultEnvironment = "development"
+const environmentFlag = "environment"
 
 var defaultIgnoredPrefixes = []string{"root"}
 
@@ -100,6 +102,7 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 	flagSet.String(configFileFlag, ngc.DefaultConfigFile, "Nuts config file")
 	flagSet.String(loggerLevelFlag, defaultLogLevel, "Log level")
 	flagSet.String(addressFlag, defaultAddress, "Address and port the server will be listening to")
+	flagSet.String(environmentFlag, defaultEnvironment, "Environment to run the node in.")
 	cmd.PersistentFlags().AddFlagSet(flagSet)
 
 	// Bind config flag
@@ -107,6 +110,7 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 	ngc.bindFlag(flagSet, configFileFlag)
 	ngc.bindFlag(flagSet, loggerLevelFlag)
 	ngc.bindFlag(flagSet, addressFlag)
+	ngc.bindFlag(flagSet, environmentFlag)
 
 	// load flags into viper
 	pfs := cmd.PersistentFlags()
@@ -120,6 +124,11 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 	// load configFile into viper
 	if err := ngc.loadConfigFile(); err != nil {
 		return err
+	}
+
+	// validate environment flag
+	if env := ngc.v.GetString(environmentFlag); env != "development" && env != "production" {
+		return fmt.Errorf("invalid value for environment flag: %s. Allowed values: [production, development]", env)
 	}
 
 	// initialize logger, verbosity flag needs to be available
@@ -277,7 +286,7 @@ func (ngc *NutsGlobalConfig) injectIntoStruct(s interface{}) error {
 
 	for _, configName := range ngc.v.AllKeys() {
 		// ignore configFile flag
-		if configName == configFileFlag || configName == loggerLevelFlag || configName == addressFlag {
+		if configName == configFileFlag || configName == loggerLevelFlag || configName == addressFlag || configName == environmentFlag {
 			continue
 		}
 
