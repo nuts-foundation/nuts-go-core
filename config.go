@@ -184,6 +184,7 @@ func (ngc *NutsGlobalConfig) PrintConfig(logger log.FieldLogger) {
 	logger.Infof(f, addressFlag, ngc.v.Get(addressFlag))
 	logger.Infof(f, configFileFlag, ngc.v.Get(configFileFlag))
 	logger.Infof(f, loggerLevelFlag, ngc.v.Get(loggerLevelFlag))
+	logger.Infof(f, environmentFlag, ngc.v.Get(environmentFlag))
 	for _, e := range EngineCtl.Engines {
 		if e.FlagSet != nil {
 			e.FlagSet.VisitAll(func(flag *pflag.Flag) {
