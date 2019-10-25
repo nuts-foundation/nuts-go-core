@@ -43,6 +43,7 @@ const defaultLogLevel = "info"
 const defaultAddress = "localhost:1323"
 const defaultEnvironment = "development"
 const environmentFlag = "environment"
+const productionEnvironment = "production"
 
 var defaultIgnoredPrefixes = []string{"root"}
 
@@ -90,6 +91,11 @@ func NutsConfig() *NutsGlobalConfig {
 
 func (ngc *NutsGlobalConfig) ServerAddress() string {
 	return ngc.v.GetString(addressFlag)
+}
+
+// IsProductionMode helps to safeguard settings which are handy and default in development but not safe for production.
+func (ngc *NutsGlobalConfig) IsProductionMode() bool {
+	return ngc.v.GetString(environmentFlag) == productionEnvironment
 }
 
 // Load sets some initial config in order to be able for commands to load the right parameters and to add the configFile Flag.
