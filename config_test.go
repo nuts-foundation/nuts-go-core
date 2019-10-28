@@ -25,6 +25,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"github.com/stretchr/testify/assert"
 	"os"
 	"reflect"
 	"strings"
@@ -138,6 +139,22 @@ func TestNutsGlobalConfig_Load2(t *testing.T) {
 		if err.Error() != expected {
 			t.Errorf("Expected error [%s], got [%v]", expected, err)
 		}
+	})
+
+	t.Run("Strict-mode is off by default", func(t *testing.T) {
+		os.Args = []string{"command"}
+		cfg := NewNutsGlobalConfig()
+		err := cfg.Load(&cobra.Command{})
+		assert.NoError(t, err)
+		assert.False(t, cfg.InStrictMode())
+	})
+
+	t.Run("Strict-mode can be turned on", func(t *testing.T) {
+		os.Args = []string{"command", "--strictmode"}
+		cfg := NewNutsGlobalConfig()
+		err := cfg.Load(&cobra.Command{})
+		assert.NoError(t, err)
+		assert.True(t, cfg.InStrictMode())
 	})
 }
 
