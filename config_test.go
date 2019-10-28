@@ -141,15 +141,20 @@ func TestNutsGlobalConfig_Load2(t *testing.T) {
 		}
 	})
 
-	t.Run("Returns error for incorrect environment", func(t *testing.T) {
-		os.Args = []string{"command", "--environment", "staging"}
+	t.Run("Strict-mode is off by default", func(t *testing.T) {
+		os.Args = []string{"command"}
 		cfg := NewNutsGlobalConfig()
-
 		err := cfg.Load(&cobra.Command{})
+		assert.NoError(t, err)
+		assert.False(t, cfg.InStrictMode())
+	})
 
-		assert.Error(t, err)
-		expected := "invalid value for environment flag: staging. Allowed values: [production, development]"
-		assert.EqualError(t, err, expected)
+	t.Run("Strict-mode can be turned on", func(t *testing.T) {
+		os.Args = []string{"command", "--strictmode"}
+		cfg := NewNutsGlobalConfig()
+		err := cfg.Load(&cobra.Command{})
+		assert.NoError(t, err)
+		assert.True(t, cfg.InStrictMode())
 	})
 }
 

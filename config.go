@@ -41,9 +41,7 @@ const loggerLevelFlag = "verbosity"
 const addressFlag = "address"
 const defaultLogLevel = "info"
 const defaultAddress = "localhost:1323"
-const defaultEnvironment = "development"
-const environmentFlag = "environment"
-const productionEnvironment = "production"
+const strictModeFlag = "strictmode"
 
 var defaultIgnoredPrefixes = []string{"root"}
 
@@ -93,9 +91,9 @@ func (ngc *NutsGlobalConfig) ServerAddress() string {
 	return ngc.v.GetString(addressFlag)
 }
 
-// IsProductionMode helps to safeguard settings which are handy and default in development but not safe for production.
-func (ngc *NutsGlobalConfig) IsProductionMode() bool {
-	return ngc.v.GetString(environmentFlag) == productionEnvironment
+// InStrictMode helps to safeguard settings which are handy and default in development but not safe for production.
+func (ngc *NutsGlobalConfig) InStrictMode() bool {
+	return ngc.v.GetBool(strictModeFlag)
 }
 
 // Load sets some initial config in order to be able for commands to load the right parameters and to add the configFile Flag.
@@ -108,7 +106,7 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 	flagSet.String(configFileFlag, ngc.DefaultConfigFile, "Nuts config file")
 	flagSet.String(loggerLevelFlag, defaultLogLevel, "Log level")
 	flagSet.String(addressFlag, defaultAddress, "Address and port the server will be listening to")
-	flagSet.String(environmentFlag, defaultEnvironment, "Environment to run the node in.")
+	flagSet.Bool(strictModeFlag, false, "When set, insecure settings are forbidden.")
 	cmd.PersistentFlags().AddFlagSet(flagSet)
 
 	// Bind config flag
@@ -116,7 +114,7 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 	ngc.bindFlag(flagSet, configFileFlag)
 	ngc.bindFlag(flagSet, loggerLevelFlag)
 	ngc.bindFlag(flagSet, addressFlag)
-	ngc.bindFlag(flagSet, environmentFlag)
+	ngc.bindFlag(flagSet, strictModeFlag)
 
 	// load flags into viper
 	pfs := cmd.PersistentFlags()
@@ -130,11 +128,6 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 	// load configFile into viper
 	if err := ngc.loadConfigFile(); err != nil {
 		return err
-	}
-
-	// validate environment flag
-	if env := ngc.v.GetString(environmentFlag); env != "development" && env != "production" {
-		return fmt.Errorf("invalid value for environment flag: %s. Allowed values: [production, development]", env)
 	}
 
 	// initialize logger, verbosity flag needs to be available
@@ -190,7 +183,7 @@ func (ngc *NutsGlobalConfig) PrintConfig(logger log.FieldLogger) {
 	logger.Infof(f, addressFlag, ngc.v.Get(addressFlag))
 	logger.Infof(f, configFileFlag, ngc.v.Get(configFileFlag))
 	logger.Infof(f, loggerLevelFlag, ngc.v.Get(loggerLevelFlag))
-	logger.Infof(f, environmentFlag, ngc.v.Get(environmentFlag))
+	logger.Infof(f, strictModeFlag, ngc.v.Get(strictModeFlag))
 	for _, e := range EngineCtl.Engines {
 		if e.FlagSet != nil {
 			e.FlagSet.VisitAll(func(flag *pflag.Flag) {
@@ -293,7 +286,7 @@ func (ngc *NutsGlobalConfig) injectIntoStruct(s interface{}) error {
 
 	for _, configName := range ngc.v.AllKeys() {
 		// ignore configFile flag
-		if configName == configFileFlag || configName == loggerLevelFlag || configName == addressFlag || configName == environmentFlag {
+		if configName == configFileFlag || configName == loggerLevelFlag || configName == addressFlag || configName == strictModeFlag {
 			continue
 		}
 
