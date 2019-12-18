@@ -20,7 +20,7 @@
 package core
 
 // NutsOID is the officially registered OID: http://oid-info.com/get/1.3.6.1.4.1.54851
-var NutsOID = "1.3.6.1.4.1.54851"
+const NutsOID = "1.3.6.1.4.1.54851"
 
 // NutsConsentClassesOID is the sub-OID used for consent classification
-var NutsConsentClassesOID = "1.3.6.1.4.1.54851.1"
+const NutsConsentClassesOID = "1.3.6.1.4.1.54851.1"
