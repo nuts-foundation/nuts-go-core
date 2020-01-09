@@ -34,6 +34,7 @@ type EngineControl struct {
 var EngineCtl EngineControl
 
 // START_DOC_ENGINE_1
+
 // Engine contains all the configuration options and callbacks needed by the executable to configure, start, monitor and shutdown the engines
 type Engine struct {
 	// Name holds the human readable name of the engine
