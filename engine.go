@@ -33,6 +33,8 @@ type EngineControl struct {
 
 var EngineCtl EngineControl
 
+// START_DOC_ENGINE_1
+
 // Engine contains all the configuration options and callbacks needed by the executable to configure, start, monitor and shutdown the engines
 type Engine struct {
 	// Name holds the human readable name of the engine
@@ -68,6 +70,7 @@ type Engine struct {
 	// Start the engine, this will spawn any clients, background tasks or active processes.
 	Start func() error
 }
+// END_DOC_ENGINE_1
 
 // RegisterEngine is a helper func to add an engine to the list of engines from a different lib/pkg
 func RegisterEngine(engine *Engine) {
