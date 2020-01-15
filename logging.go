@@ -42,6 +42,10 @@ func NewLoggerEngine() *Engine {
 				printLoggerSetup(lc)
 			},
 		},
+		Diagnostics: func() []DiagnosticResult {
+			dr := &GenericDiagnosticResult{name: "Logger verbosity", outcome: lc.verbosity}
+			return []DiagnosticResult{dr}
+		},
 	}
 }
 

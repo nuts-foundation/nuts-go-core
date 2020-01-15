@@ -38,16 +38,6 @@ func TestRegisterEngine(t *testing.T) {
 			t.Errorf("Expected 1 registered engine, Got %d", len(ctl.Engines))
 		}
 	})
-
-	t.Run("has been called by init to register StatusEngine", func(t *testing.T) {
-		EngineCtl.registerEngine(&Engine{})
-		if len(EngineCtl.Engines) != 1 {
-			t.Errorf("Expected 1 registered engine, Got %d", len(EngineCtl.Engines))
-		}
-	})
-}
-
-type dummyEngine struct {
 }
 
 func TestNewStatusEngine_Routes(t *testing.T) {
