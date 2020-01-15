@@ -32,7 +32,7 @@ func TestGenericDiagnosticResult_Name(t *testing.T) {
 }
 
 func TestGenericDiagnosticResult_String(t *testing.T) {
-	gdr := GenericDiagnosticResult{description: "test"}
+	gdr := GenericDiagnosticResult{outcome: "test"}
 
 	assert.Equal(t, "test", gdr.String())
 }
