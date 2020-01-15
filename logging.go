@@ -39,7 +39,7 @@ func NewLoggerEngine() *Engine {
 			Use:   "logStatus",
 			Short: "show the current logging setup",
 			Run: func(cmd *cobra.Command, args []string) {
-				printLoggerSetup(lc)
+				log.Infof("Verbosity is set to %s\n", lc.verbosity)
 			},
 		},
 		Diagnostics: func() []DiagnosticResult {
@@ -47,8 +47,4 @@ func NewLoggerEngine() *Engine {
 			return []DiagnosticResult{dr}
 		},
 	}
-}
-
-func printLoggerSetup(lc loggerConfig) {
-	log.Infof("Verbosity is set to %s\n", lc.verbosity)
 }
