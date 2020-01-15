@@ -20,7 +20,11 @@
 package core
 
 import (
+	"net/http"
 	"testing"
+
+	"github.com/golang/mock/gomock"
+	"github.com/nuts-foundation/nuts-go-core/mock"
 )
 
 func TestRegisterEngine(t *testing.T) {
@@ -41,4 +45,54 @@ func TestRegisterEngine(t *testing.T) {
 			t.Errorf("Expected 1 registered engine, Got %d", len(EngineCtl.Engines))
 		}
 	})
+}
+
+type dummyEngine struct {
+}
+
+func TestNewStatusEngine_Routes(t *testing.T) {
+	t.Run("Registers a single route for listing all engines", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+		echo := mock.NewMockEchoRouter(ctrl)
+
+		echo.EXPECT().GET("/status/engines", gomock.Any())
+		echo.EXPECT().GET("/status", gomock.Any())
+
+		NewStatusEngine().Routes(echo)
+	})
+}
+
+func TestNewStatusEngine_Cmd(t *testing.T) {
+	t.Run("Cmd returns a cobra command", func(t *testing.T) {
+		e := NewStatusEngine().Cmd
+		if e.Name() != "engineStatus" {
+			t.Errorf("Expected a command with name engineStatus, Got %s", e.Name())
+		}
+	})
+}
+
+func TestListAllEngines(t *testing.T) {
+	RegisterEngine(NewLoggerEngine())
+	RegisterEngine(NewStatusEngine())
+
+	t.Run("ListAllEngines renders json output of list of engines", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+		echo := mock.NewMockContext(ctrl)
+
+		echo.EXPECT().JSON(http.StatusOK, []string{"Logging", "Status"})
+
+		ListAllEngines(echo)
+	})
+}
+
+func TestStatusOK(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	echo := mock.NewMockContext(ctrl)
+
+	echo.EXPECT().String(http.StatusOK, "OK")
+
+	StatusOK(echo)
 }
