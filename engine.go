@@ -58,6 +58,9 @@ type Engine struct {
 	// Configure checks if the combination of config parameters is allowed
 	Configure func() error
 
+	// Diagnostics returns a slice of DiagnosticResult
+	Diagnostics func() []*DiagnosticResult
+
 	// FlasSet contains all engine-local configuration possibilities so they can be displayed through the help command
 	FlagSet *pflag.FlagSet
 
