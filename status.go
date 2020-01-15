@@ -34,11 +34,10 @@ func NewStatusEngine() *Engine {
 	return &Engine{
 		Name: "Status",
 		Cmd: &cobra.Command{
-			Use:   "engineStatus",
-			Short: "show the registered engines",
+			Use:   "diagnostics",
+			Short: "show engine diagnostics",
 			Run: func(cmd *cobra.Command, args []string) {
-				names := listAllEngines()
-				fmt.Println(strings.Join(names, ","))
+				diagnosticsSummaryAsText()
 			},
 		},
 		Diagnostics: func() []DiagnosticResult {
@@ -52,6 +51,10 @@ func NewStatusEngine() *Engine {
 }
 
 func diagnosticsOverview(ctx echo.Context) error {
+	return ctx.String(http.StatusOK, diagnosticsSummaryAsText())
+}
+
+func diagnosticsSummaryAsText() string {
 	var diagnostics []DiagnosticResult
 	for _, e := range EngineCtl.Engines {
 		if e.Diagnostics != nil {
@@ -64,8 +67,7 @@ func diagnosticsOverview(ctx echo.Context) error {
 		lines = append(lines, fmt.Sprintf("%s: %s", d.Name(), d.String()))
 	}
 
-	// generate output
-	return ctx.String(http.StatusOK, strings.Join(lines, "\n"))
+	return strings.Join(lines, "\n")
 }
 
 func diagnostics() DiagnosticResult {

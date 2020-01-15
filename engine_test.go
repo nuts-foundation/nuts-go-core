@@ -20,7 +20,9 @@
 package core
 
 import (
+	"io/ioutil"
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -57,9 +59,21 @@ func TestNewStatusEngine_Routes(t *testing.T) {
 func TestNewStatusEngine_Cmd(t *testing.T) {
 	t.Run("Cmd returns a cobra command", func(t *testing.T) {
 		e := NewStatusEngine().Cmd
-		if e.Name() != "engineStatus" {
-			t.Errorf("Expected a command with name engineStatus, Got %s", e.Name())
-		}
+		assert.Equal(t, "diagnostics", e.Name())
+	})
+
+	t.Run("Executed Cmd writes diagnostics to prompt", func(t *testing.T) {
+		rescueStdout := os.Stdout
+		r, w, _ := os.Pipe()
+		os.Stdout = w
+
+		NewStatusEngine().Cmd.Execute()
+
+		w.Close()
+		out, _ := ioutil.ReadAll(r)
+		os.Stdout = rescueStdout
+
+		assert.Equal(t, "", string(out))
 	})
 }
 
@@ -67,14 +81,14 @@ func TestNewStatusEngine_Diagnostics(t *testing.T) {
 	RegisterEngine(NewStatusEngine())
 	RegisterEngine(NewLoggerEngine())
 
-	t.Run("Diagnostics returns engine list", func(t *testing.T) {
+	t.Run("diagnostics() returns engine list", func(t *testing.T) {
 		ds := NewStatusEngine().Diagnostics()
 		assert.Len(t, ds, 1)
 		assert.Equal(t, "Registered engines", ds[0].Name())
 		assert.Equal(t, "Status,Logging", ds[0].String())
 	})
 
-	t.Run("ListAllEngines renders json output of list of engines", func(t *testing.T) {
+	t.Run("diagnosticsOverview() renders text output of diagnostics", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		echo := mock.NewMockContext(ctrl)
