@@ -21,15 +21,16 @@ package core
 
 import (
 	"bytes"
+	"os"
+	"reflect"
+	"strings"
+	"testing"
+
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"reflect"
-	"strings"
-	"testing"
 )
 
 func TestNewNutsGlobalConfig(t *testing.T) {
@@ -230,7 +231,6 @@ func TestNutsGlobalConfig_RegisterFlags(t *testing.T) {
 
 		var found bool
 		for _, key := range cfg.v.AllKeys() {
-			println(key)
 			if key == "key" {
 				found = true
 			}
@@ -300,12 +300,8 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 
 	t.Run("Adds configFile flag to Cmd", func(t *testing.T) {
 		err := cfg.LoadAndUnmarshal(&cobra.Command{}, &struct{}{})
-		if err != nil {
-			t.Errorf("Expected no error, got [%v]", err.Error())
-		}
-
-		if !cfg.v.IsSet(configFileFlag) {
-			t.Errorf("Expected %s to be set", configFileFlag)
+		if assert.NoError(t, err) {
+			assert.NotEmpty(t, cfg.v.GetString(configFileFlag))
 		}
 	})
 

@@ -17,6 +17,20 @@ Once defined it can be registered:
 
     RegisterEngine(&engine)
 
+Engine monitoring
+=================
+
+Each Engine must have a diagnostic function called `Diagnostics()` which returns information on how well the engine is performing.
+The information can be used for monitoring and/or debugging.
+The **status** engine exposes this information at the `/status/diagnostics` endpoint in plain text format.
+
+.. code-block:: text
+
+    memory usage: 256m
+    established connections: 20
+    loaded engines: status, logging
+    ...
+
 Standalone
 ==========
 

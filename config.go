@@ -22,15 +22,16 @@ package core
 import (
 	"errors"
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
-	"github.com/spf13/viper"
 	"math"
 	"os"
 	"reflect"
 	"strings"
 	"sync"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
 const defaultPrefix = "NUTS"
