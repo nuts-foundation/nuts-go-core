@@ -41,19 +41,35 @@ func NewStatusEngine() *Engine {
 				fmt.Println(strings.Join(names, ","))
 			},
 		},
+		Diagnostics: func() []DiagnosticResult {
+			return []DiagnosticResult{diagnostics()}
+		},
 		Routes: func(router runtime.EchoRouter) {
-			router.GET("/status/engines", ListAllEngines)
+			router.GET("/status/diagnostics", diagnosticsOverview)
 			router.GET("/status", StatusOK)
 		},
 	}
 }
 
-// ListAllEngines is the handler function for the /status/engines api call
-func ListAllEngines(ctx echo.Context) error {
-	names := listAllEngines()
+func diagnosticsOverview(ctx echo.Context) error {
+	var diagnostics []DiagnosticResult
+	for _, e := range EngineCtl.Engines {
+		if e.Diagnostics != nil {
+			diagnostics = append(diagnostics, e.Diagnostics()...)
+		}
+	}
+
+	var lines []string
+	for _, d := range diagnostics {
+		lines = append(lines, fmt.Sprintf("%s: %s", d.Name(), d.String()))
+	}
 
 	// generate output
-	return ctx.JSON(http.StatusOK, names)
+	return ctx.String(http.StatusOK, strings.Join(lines, "\n"))
+}
+
+func diagnostics() DiagnosticResult {
+	return &GenericDiagnosticResult{name: "Registered engines", outcome: strings.Join(listAllEngines(), ",")}
 }
 
 // StatusOK returns 200 OK with a zero length body

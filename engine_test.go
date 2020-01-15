@@ -25,6 +25,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/nuts-foundation/nuts-go-core/mock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestRegisterEngine(t *testing.T) {
@@ -46,7 +47,7 @@ func TestNewStatusEngine_Routes(t *testing.T) {
 		defer ctrl.Finish()
 		echo := mock.NewMockEchoRouter(ctrl)
 
-		echo.EXPECT().GET("/status/engines", gomock.Any())
+		echo.EXPECT().GET("/status/diagnostics", gomock.Any())
 		echo.EXPECT().GET("/status", gomock.Any())
 
 		NewStatusEngine().Routes(echo)
@@ -62,18 +63,25 @@ func TestNewStatusEngine_Cmd(t *testing.T) {
 	})
 }
 
-func TestListAllEngines(t *testing.T) {
-	RegisterEngine(NewLoggerEngine())
+func TestNewStatusEngine_Diagnostics(t *testing.T) {
 	RegisterEngine(NewStatusEngine())
+	RegisterEngine(NewLoggerEngine())
+
+	t.Run("Diagnostics returns engine list", func(t *testing.T) {
+		ds := NewStatusEngine().Diagnostics()
+		assert.Len(t, ds, 1)
+		assert.Equal(t, "Registered engines", ds[0].Name())
+		assert.Equal(t, "Status,Logging", ds[0].String())
+	})
 
 	t.Run("ListAllEngines renders json output of list of engines", func(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 		echo := mock.NewMockContext(ctrl)
 
-		echo.EXPECT().JSON(http.StatusOK, []string{"Logging", "Status"})
+		echo.EXPECT().String(http.StatusOK, "Registered engines: Status,Logging\nLogger verbosity: ")
 
-		ListAllEngines(echo)
+		diagnosticsOverview(echo)
 	})
 }
 
