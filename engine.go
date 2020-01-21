@@ -59,7 +59,7 @@ type Engine struct {
 	Configure func() error
 
 	// Diagnostics returns a slice of DiagnosticResult
-	Diagnostics func() []*DiagnosticResult
+	Diagnostics func() []DiagnosticResult
 
 	// FlasSet contains all engine-local configuration possibilities so they can be displayed through the help command
 	FlagSet *pflag.FlagSet
@@ -73,6 +73,7 @@ type Engine struct {
 	// Start the engine, this will spawn any clients, background tasks or active processes.
 	Start func() error
 }
+
 // END_DOC_ENGINE_1
 
 // RegisterEngine is a helper func to add an engine to the list of engines from a different lib/pkg
