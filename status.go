@@ -74,7 +74,7 @@ func diagnostics() DiagnosticResult {
 	return &GenericDiagnosticResult{name: "Registered engines", outcome: strings.Join(listAllEngines(), ",")}
 }
 
-// StatusOK returns 200 OK with a zero length body
+// StatusOK returns 200 OK with a "OK" body
 func StatusOK(ctx echo.Context) error {
 	return ctx.String(http.StatusOK, "OK")
 }
