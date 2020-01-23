@@ -90,10 +90,7 @@ func DecodeURIPath(next echo.HandlerFunc) echo.HandlerFunc {
 			newValues = append(newValues, path)
 		}
 		c.SetParamValues(newValues...)
-		if err := next(c); err != nil {
-			c.Error(err)
-		}
-		return nil
+		return next(c)
 	}
 }
 
