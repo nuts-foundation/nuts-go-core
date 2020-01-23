@@ -21,8 +21,10 @@ package core
 
 import (
 	"github.com/deepmap/oapi-codegen/pkg/runtime"
+	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"net/url"
 )
 
 // EngineCtl is the control structure where engines are registered. All registered engines are referenced by the EngineCtl
@@ -75,6 +77,25 @@ type Engine struct {
 }
 
 // END_DOC_ENGINE_1
+
+// DecodeUriPath is a echo middleware that decodes path parameters
+func DecodeUriPath(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var newValues []string
+		for _, value := range c.ParamValues() {
+			path, err := url.PathUnescape(value)
+			if err != nil {
+				path = value
+			}
+			newValues = append(newValues, path)
+		}
+		c.SetParamValues(newValues...)
+		if err := next(c); err != nil {
+			c.Error(err)
+		}
+		return nil
+	}
+}
 
 // RegisterEngine is a helper func to add an engine to the list of engines from a different lib/pkg
 func RegisterEngine(engine *Engine) {
