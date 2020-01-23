@@ -78,7 +78,7 @@ type Engine struct {
 
 // END_DOC_ENGINE_1
 
-// DecodeUriPath is a echo middleware that decodes path parameters
+// DecodeURIPath is a echo middleware that decodes path parameters
 func DecodeURIPath(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var newValues []string
