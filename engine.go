@@ -81,13 +81,15 @@ type Engine struct {
 // DecodeURIPath is a echo middleware that decodes path parameters
 func DecodeURIPath(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var newValues []string
-		for _, value := range c.ParamValues() {
+		// FIXME: This is a hack because of https://github.com/labstack/echo/issues/1258
+		// Create a list with enough space for 10 path params
+		newValues := make([]string, 10)
+		for i, value := range c.ParamValues() {
 			path, err := url.PathUnescape(value)
 			if err != nil {
 				path = value
 			}
-			newValues = append(newValues, path)
+			newValues[i] = path
 		}
 		c.SetParamValues(newValues...)
 		return next(c)
