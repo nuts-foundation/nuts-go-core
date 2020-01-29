@@ -55,23 +55,22 @@ func diagnosticsOverview(ctx echo.Context) error {
 }
 
 func diagnosticsSummaryAsText() string {
-	var diagnostics []DiagnosticResult
+	var lines []string
 	for _, e := range EngineCtl.Engines {
 		if e.Diagnostics != nil {
-			diagnostics = append(diagnostics, e.Diagnostics()...)
+			lines = append(lines, e.Name)
+			diagnostics := e.Diagnostics()
+			for _, d := range diagnostics {
+				lines = append(lines, fmt.Sprintf("\t%s: %s", d.Name(), d.String()))
+			}
 		}
-	}
-
-	var lines []string
-	for _, d := range diagnostics {
-		lines = append(lines, fmt.Sprintf("%s: %s", d.Name(), d.String()))
 	}
 
 	return strings.Join(lines, "\n")
 }
 
 func diagnostics() DiagnosticResult {
-	return &GenericDiagnosticResult{name: "Registered engines", outcome: strings.Join(listAllEngines(), ",")}
+	return &GenericDiagnosticResult{Title: "Registered engines", Outcome: strings.Join(listAllEngines(), ",")}
 }
 
 // StatusOK returns 200 OK with a "OK" body

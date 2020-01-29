@@ -43,7 +43,7 @@ func NewLoggerEngine() *Engine {
 			},
 		},
 		Diagnostics: func() []DiagnosticResult {
-			dr := &GenericDiagnosticResult{name: "Logger verbosity", outcome: lc.verbosity}
+			dr := &GenericDiagnosticResult{Title: "verbosity", Outcome: lc.verbosity}
 			return []DiagnosticResult{dr}
 		},
 	}
