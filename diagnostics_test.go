@@ -26,13 +26,13 @@ import (
 )
 
 func TestGenericDiagnosticResult_Name(t *testing.T) {
-	gdr := GenericDiagnosticResult{name: "test"}
+	gdr := GenericDiagnosticResult{Title: "test"}
 
 	assert.Equal(t, "test", gdr.Name())
 }
 
 func TestGenericDiagnosticResult_String(t *testing.T) {
-	gdr := GenericDiagnosticResult{outcome: "test"}
+	gdr := GenericDiagnosticResult{Outcome: "test"}
 
 	assert.Equal(t, "test", gdr.String())
 }

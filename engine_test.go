@@ -21,12 +21,13 @@ package core
 
 import (
 	"fmt"
-	"github.com/labstack/echo/v4"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+
+	"github.com/labstack/echo/v4"
 
 	"github.com/golang/mock/gomock"
 	"github.com/nuts-foundation/nuts-go-core/mock"
@@ -96,7 +97,7 @@ func TestNewStatusEngine_Diagnostics(t *testing.T) {
 		defer ctrl.Finish()
 		echo := mock.NewMockContext(ctrl)
 
-		echo.EXPECT().String(http.StatusOK, "Registered engines: Status,Logging\nLogger verbosity: ")
+		echo.EXPECT().String(http.StatusOK, "Status\n\tRegistered engines: Status,Logging\nLogging\n\tverbosity: ")
 
 		diagnosticsOverview(echo)
 	})

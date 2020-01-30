@@ -30,16 +30,16 @@ type DiagnosticResult interface {
 
 // GenericDiagnosticResult is a simple implementation of the DiagnosticResult interface
 type GenericDiagnosticResult struct {
-	name    string
-	outcome string
+	Title   string
+	Outcome string
 }
 
 // Name returns the name of the GenericDiagnosticResult
 func (gdr *GenericDiagnosticResult) Name() string {
-	return gdr.name
+	return gdr.Title
 }
 
 // String returns the outcome of the GenericDiagnosticResult
 func (gdr *GenericDiagnosticResult) String() string {
-	return gdr.outcome
+	return gdr.Outcome
 }
