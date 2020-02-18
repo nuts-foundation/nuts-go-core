@@ -157,6 +157,15 @@ func TestNutsGlobalConfig_Load2(t *testing.T) {
 		assert.NoError(t, err)
 		assert.True(t, cfg.InStrictMode())
 	})
+
+	t.Run("Unsupported mode", func(t *testing.T) {
+		os.Setenv("NUTS_MODE", "foobar")
+		defer func() {
+			os.Unsetenv("NUTS_MODE")
+		}()
+		err := NewNutsGlobalConfig().Load(&cobra.Command{})
+		assert.Error(t, err)
+	})
 }
 
 func TestNutsGlobalConfig_PrintConfig(t *testing.T) {

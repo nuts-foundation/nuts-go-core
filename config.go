@@ -43,6 +43,7 @@ const addressFlag = "address"
 const defaultLogLevel = "info"
 const defaultAddress = "localhost:1323"
 const strictModeFlag = "strictmode"
+const modeFlag = "mode"
 
 var defaultIgnoredPrefixes = []string{"root"}
 
@@ -62,6 +63,13 @@ type NutsGlobalConfig struct {
 
 	v *viper.Viper
 }
+
+const (
+	// ClientMode is used for starting the node in client mode
+	ClientMode string = "client"
+	// ServerMode is used for starting the node in server mode
+	ServerMode string = "server"
+)
 
 // NewNutsGlobalConfig creates a NutsGlobalConfig with the following defaults
 // * Prefix: NUTS
@@ -88,13 +96,18 @@ func NutsConfig() *NutsGlobalConfig {
 	return configInstance
 }
 
-func (ngc *NutsGlobalConfig) ServerAddress() string {
+func (ngc NutsGlobalConfig) ServerAddress() string {
 	return ngc.v.GetString(addressFlag)
 }
 
 // InStrictMode helps to safeguard settings which are handy and default in development but not safe for production.
-func (ngc *NutsGlobalConfig) InStrictMode() bool {
+func (ngc NutsGlobalConfig) InStrictMode() bool {
 	return ngc.v.GetBool(strictModeFlag)
+}
+
+// Mode returns the configured mode (client/server).
+func (ngc NutsGlobalConfig) Mode() string {
+	return ngc.v.GetString(modeFlag)
 }
 
 // Load sets some initial config in order to be able for commands to load the right parameters and to add the configFile Flag.
@@ -108,6 +121,7 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 	flagSet.String(loggerLevelFlag, defaultLogLevel, "Log level")
 	flagSet.String(addressFlag, defaultAddress, "Address and port the server will be listening to")
 	flagSet.Bool(strictModeFlag, false, "When set, insecure settings are forbidden.")
+	flagSet.String(modeFlag, "server", "Sets the mode for the Nuts node, defaults to server mode.")
 	cmd.PersistentFlags().AddFlagSet(flagSet)
 
 	// Bind config flag
@@ -116,6 +130,7 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 	ngc.bindFlag(flagSet, loggerLevelFlag)
 	ngc.bindFlag(flagSet, addressFlag)
 	ngc.bindFlag(flagSet, strictModeFlag)
+	ngc.bindFlag(flagSet, modeFlag)
 
 	// load flags into viper
 	pfs := cmd.PersistentFlags()
@@ -137,6 +152,10 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 		return err
 	}
 	log.SetLevel(level)
+
+	if ngc.Mode() != ClientMode && ngc.Mode() != ServerMode {
+		return fmt.Errorf("unsupported mode: %s", ngc.Mode())
+	}
 
 	return nil
 }
@@ -185,6 +204,7 @@ func (ngc *NutsGlobalConfig) PrintConfig(logger log.FieldLogger) {
 	logger.Infof(f, configFileFlag, ngc.v.Get(configFileFlag))
 	logger.Infof(f, loggerLevelFlag, ngc.v.Get(loggerLevelFlag))
 	logger.Infof(f, strictModeFlag, ngc.v.Get(strictModeFlag))
+	logger.Infof(f, modeFlag, ngc.v.Get(modeFlag))
 	for _, e := range EngineCtl.Engines {
 		if e.FlagSet != nil {
 			e.FlagSet.VisitAll(func(flag *pflag.Flag) {
@@ -286,8 +306,8 @@ func (ngc *NutsGlobalConfig) injectIntoStruct(s interface{}) error {
 	var err error
 
 	for _, configName := range ngc.v.AllKeys() {
-		// ignore configFile flag
-		if configName == configFileFlag || configName == loggerLevelFlag || configName == addressFlag || configName == strictModeFlag {
+		// ignore global flags
+		if configName == configFileFlag || configName == loggerLevelFlag || configName == addressFlag || configName == strictModeFlag || configName == modeFlag {
 			continue
 		}
 
