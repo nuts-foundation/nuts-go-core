@@ -96,6 +96,7 @@ func NutsConfig() *NutsGlobalConfig {
 	return configInstance
 }
 
+// ServerAddress is the address which is used to either listen on (in server mode) or connect to (in client mode).
 func (ngc NutsGlobalConfig) ServerAddress() string {
 	return ngc.v.GetString(addressFlag)
 }
