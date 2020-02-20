@@ -65,10 +65,18 @@ type NutsGlobalConfig struct {
 }
 
 const (
-	// ClientMode is used for starting the node in client mode
-	ClientMode string = "client"
-	// ServerMode is used for starting the node in server mode
-	ServerMode string = "server"
+	// ServerEngineMode is used for starting a node's engine in server mode
+	ServerEngineMode string = "server"
+	// ClientEngineMode is used for starting a node's engine in client mode
+	ClientEngineMode string = "client"
+)
+
+const (
+	// GlobalServerMode is used for starting the application in server mode, running as Nuts node.
+	GlobalServerMode string = "server"
+	// GlobalCLIMode is used for starting the application in CLI mode, meaning it's used as CLI client administering
+	// for a remote Nuts node. Engines will start in client mode when this mode is specified.
+	GlobalCLIMode string = "cli"
 )
 
 // NewNutsGlobalConfig creates a NutsGlobalConfig with the following defaults
@@ -109,6 +117,21 @@ func (ngc NutsGlobalConfig) InStrictMode() bool {
 // Mode returns the configured mode (client/server).
 func (ngc NutsGlobalConfig) Mode() string {
 	return ngc.v.GetString(modeFlag)
+}
+
+// ConfigureEngineMode configures an engine mode if not already configured. If the application is started in 'cli' mode,
+// its engines are configured to run in 'client' mode. This function returns the proper mode for the engine in and should be used as follows:
+// engineConfig.Mode = GetEngineMode(engineConfig.Mode)
+func (ngc NutsGlobalConfig) GetEngineMode(engineMode string) string {
+	if engineMode == "" {
+		switch ngc.Mode() {
+		case GlobalCLIMode:
+			return ClientEngineMode
+		default:
+			return GlobalServerMode
+		}
+	}
+	return engineMode
 }
 
 // Load sets some initial config in order to be able for commands to load the right parameters and to add the configFile Flag.
@@ -154,8 +177,8 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 	}
 	log.SetLevel(level)
 
-	if ngc.Mode() != ClientMode && ngc.Mode() != ServerMode {
-		return fmt.Errorf("unsupported mode: %s", ngc.Mode())
+	if ngc.Mode() != GlobalCLIMode && ngc.Mode() != GlobalServerMode {
+		return fmt.Errorf("unsupported global mode: %s, supported modes: %s", ngc.Mode(), strings.Join([]string{GlobalCLIMode, GlobalServerMode}, ", "))
 	}
 
 	return nil

@@ -604,3 +604,19 @@ func TestNutsGlobalConfig_InjectIntoEngine(t *testing.T) {
 		}
 	})
 }
+
+func TestNutsGlobalConfig_GetEngineMode(t *testing.T) {
+	c := NewNutsGlobalConfig()
+	t.Run("engine mode = empty, global mode = cli", func(t *testing.T) {
+		c.v.Set(modeFlag, GlobalCLIMode)
+		assert.Equal(t, ClientEngineMode, c.GetEngineMode(""))
+	})
+	t.Run("engine mode = empty, global mode = server", func(t *testing.T) {
+		c.v.Set(modeFlag, GlobalServerMode)
+		assert.Equal(t, ServerEngineMode, c.GetEngineMode(""))
+	})
+	t.Run("engine mode = not empty", func(t *testing.T) {
+		c.v.Set(modeFlag, GlobalCLIMode)
+		assert.Equal(t, ServerEngineMode, c.GetEngineMode(ServerEngineMode))
+	})
+}
