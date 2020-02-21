@@ -361,7 +361,7 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 			return
 		}
 
-		expected := "problem injecting [key]: Map values not supported in map[string]string"
+		expected := "problem injecting [key]: map values not supported in map[string]string"
 		if err.Error() != expected {
 			t.Errorf("Expected error [%s], got [%v]", expected, err.Error())
 		}
@@ -461,6 +461,28 @@ func TestNutsGlobalConfig_InjectIntoEngine(t *testing.T) {
 		}
 
 		if c.EnvKey != 1 {
+			t.Errorf("Expected value to be injected into struct")
+		}
+	})
+
+	t.Run("bool param is injected into engine from env variable", func(t *testing.T) {
+		c := struct {
+			EnvKey bool
+		}{}
+
+		e := &Engine{
+			Config:  &c,
+			FlagSet: pflag.NewFlagSet("dummy", pflag.ContinueOnError),
+		}
+		e.FlagSet.Bool("envKey", false, "")
+
+		os.Setenv("NUTS_ENVKEY", "true")
+
+		if err := cfg.InjectIntoEngine(e); err != nil {
+			t.Errorf("Expected no error, got [%v]", err.Error())
+		}
+
+		if c.EnvKey != true {
 			t.Errorf("Expected value to be injected into struct")
 		}
 	})

@@ -307,6 +307,9 @@ func (ngc *NutsGlobalConfig) InjectIntoEngine(e *Engine) error {
 					val = ngc.v.GetInt64(configName)
 				case reflect.String:
 					val = ngc.v.GetString(configName)
+				case reflect.Bool:
+					val = ngc.v.GetBool(configName)
+					break
 				default:
 					val = ngc.v.Get(configName)
 				}
@@ -472,7 +475,7 @@ func (ngc *NutsGlobalConfig) findFieldRecursive(s *reflect.Value, names []string
 		}
 		return ngc.findFieldRecursive(&field, tail)
 	case reflect.Map:
-		return nil, fmt.Errorf("Map values not supported in %v", field.Type())
+		return nil, fmt.Errorf("map values not supported in %v", field.Type())
 	default:
 		if len(tail) > 0 {
 			n := fmt.Sprintf("%s.%s", head, strings.Join(tail, "."))
