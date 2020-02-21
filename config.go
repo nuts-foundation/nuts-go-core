@@ -128,7 +128,7 @@ func (ngc NutsGlobalConfig) GetEngineMode(engineMode string) string {
 		case GlobalCLIMode:
 			return ClientEngineMode
 		default:
-			return GlobalServerMode
+			return ServerEngineMode
 		}
 	}
 	return engineMode
