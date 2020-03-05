@@ -25,6 +25,7 @@ import (
 	"math"
 	"os"
 	"reflect"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -44,6 +45,7 @@ const defaultLogLevel = "info"
 const defaultAddress = "localhost:1323"
 const strictModeFlag = "strictmode"
 const modeFlag = "mode"
+const identityFlag = "identity"
 
 var defaultIgnoredPrefixes = []string{"root"}
 
@@ -63,6 +65,16 @@ type NutsGlobalConfig struct {
 
 	v *viper.Viper
 }
+
+// NutsConfigValues exposes global configuration values
+type NutsConfigValues interface {
+	ServerAddress() string
+	InStrictMode() bool
+	Mode() string
+	Identity() string
+	GetEngineMode(engineMode string) string
+}
+
 
 const (
 	// ServerEngineMode is used for starting a node's engine in server mode
@@ -119,6 +131,12 @@ func (ngc NutsGlobalConfig) Mode() string {
 	return ngc.v.GetString(modeFlag)
 }
 
+// Identity returns the identity. This is a mandatory parameter which must be in the following form:
+// urn:oid:1.3.6.1.4.1.54851.4:<number>
+func (ngc NutsGlobalConfig) Identity() string {
+	return ngc.v.GetString(identityFlag)
+}
+
 // GetEngineMode configures an engine mode if not already configured. If the application is started in 'cli' mode,
 // its engines are configured to run in 'client' mode. This function returns the proper mode for the engine in and should be used as follows:
 // engineConfig.Mode = GetEngineMode(engineConfig.Mode)
@@ -146,6 +164,7 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 	flagSet.String(addressFlag, defaultAddress, "Address and port the server will be listening to")
 	flagSet.Bool(strictModeFlag, false, "When set, insecure settings are forbidden.")
 	flagSet.String(modeFlag, "server", "Sets the mode for the Nuts node, defaults to server mode.")
+	flagSet.String(identityFlag, "", "Vendor identity for the node, mandatory when running in server mode. Must be in the format: urn:oid:"+ NutsVendorOID + ":<number>")
 	cmd.PersistentFlags().AddFlagSet(flagSet)
 
 	// Bind config flag
@@ -155,6 +174,7 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 	ngc.bindFlag(flagSet, addressFlag)
 	ngc.bindFlag(flagSet, strictModeFlag)
 	ngc.bindFlag(flagSet, modeFlag)
+	ngc.bindFlag(flagSet, identityFlag)
 
 	// load flags into viper
 	pfs := cmd.PersistentFlags()
@@ -181,6 +201,29 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 		return fmt.Errorf("unsupported global mode: %s, supported modes: %s", ngc.Mode(), strings.Join([]string{GlobalCLIMode, GlobalServerMode}, ", "))
 	}
 
+	// Validate identity
+	if ngc.Mode() == GlobalServerMode {
+		identity := ngc.Identity()
+		if identity == "" {
+			return fmt.Errorf("identity not configured (either through %s or %s env variable)", ngc.DefaultConfigFile, ngc.Prefix+"_IDENTITY")
+		}
+		if err := validateIdentity(identity); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func validateIdentity(identity string) error {
+	vendorIDPattern := "urn:oid:" + strings.ReplaceAll(NutsVendorOID, ".", "\\.") + ":[0-9]+"
+	identityIsValid, err := regexp.MatchString(vendorIDPattern, identity)
+	if err != nil {
+		return err
+	}
+	if !identityIsValid {
+		return fmt.Errorf("identity is invalid (id = %s, pattern = %s)", identity, vendorIDPattern)
+	}
 	return nil
 }
 
@@ -224,11 +267,12 @@ func (ngc *NutsGlobalConfig) PrintConfig(logger log.FieldLogger) {
 
 	f := fmt.Sprintf("%%-%ds%%v", 7+longestKey)
 
-	logger.Infof(f, addressFlag, ngc.v.Get(addressFlag))
+	logger.Infof(f, identityFlag, ngc.Identity())
+	logger.Infof(f, addressFlag, ngc.ServerAddress())
 	logger.Infof(f, configFileFlag, ngc.v.Get(configFileFlag))
 	logger.Infof(f, loggerLevelFlag, ngc.v.Get(loggerLevelFlag))
-	logger.Infof(f, strictModeFlag, ngc.v.Get(strictModeFlag))
-	logger.Infof(f, modeFlag, ngc.v.Get(modeFlag))
+	logger.Infof(f, strictModeFlag, ngc.InStrictMode())
+	logger.Infof(f, modeFlag, ngc.Mode())
 	for _, e := range EngineCtl.Engines {
 		if e.FlagSet != nil {
 			e.FlagSet.VisitAll(func(flag *pflag.Flag) {

@@ -65,6 +65,8 @@ func TestNutsConfig(t *testing.T) {
 
 func TestNutsGlobalConfig_Load(t *testing.T) {
 	cfg := NewNutsGlobalConfig()
+	os.Setenv("NUTS_IDENTITY", "urn:oid:1.3.6.1.4.1.54851.4:4")
+	defer os.Unsetenv("NUTS_IDENTITY")
 
 	if err := cfg.Load(&cobra.Command{}); err != nil {
 		t.Errorf("Expected no error, got %v", err)
@@ -89,12 +91,26 @@ func TestNutsGlobalConfig_Load(t *testing.T) {
 			t.Errorf("Expected configFile to be [%s], got [%v]", defaultConfigFile, value)
 		}
 	})
+
+	t.Run("Identity not configured", func(t *testing.T) {
+		os.Unsetenv("NUTS_IDENTITY")
+		err := cfg.Load(&cobra.Command{})
+		assert.Contains(t, err.Error(), "identity not configured (either through nuts.yaml or NUTS_IDENTITY env variable)")
+	})
+
+	t.Run("Configured identity is invalid", func(t *testing.T) {
+		os.Setenv("NUTS_IDENTITY", "foobar")
+		err := cfg.Load(&cobra.Command{})
+		assert.Contains(t, err.Error(), "identity is invalid")
+	})
 }
 
 func TestNutsGlobalConfig_Load2(t *testing.T) {
 	defer func() {
 		os.Args = []string{"command"}
 	}()
+	os.Setenv("NUTS_IDENTITY", "urn:oid:1.3.6.1.4.1.54851.4:4")
+	defer os.Unsetenv("NUTS_IDENTITY")
 
 	t.Run("Ignores unknown flags when parsing", func(t *testing.T) {
 		os.Args = []string{"executable", "command", "--unknown", "value"}
@@ -305,10 +321,16 @@ func TestNutsGlobalConfig_LoadConfigFile(t *testing.T) {
 
 func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 	cfg := NewNutsGlobalConfig()
+	os.Setenv("NUTS_IDENTITY", "urn:oid:1.3.6.1.4.1.54851.4:4")
+	defer os.Unsetenv("NUTS_IDENTITY")
 	cfg.Load(&cobra.Command{})
 
+	type mandatory struct {
+		Identity string
+	}
+
 	t.Run("Adds configFile flag to Cmd", func(t *testing.T) {
-		err := cfg.LoadAndUnmarshal(&cobra.Command{}, &struct{}{})
+		err := cfg.LoadAndUnmarshal(&cobra.Command{}, &struct{mandatory}{})
 		if assert.NoError(t, err) {
 			assert.NotEmpty(t, cfg.v.GetString(configFileFlag))
 		}
@@ -316,9 +338,10 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 
 	t.Run("Injects custom config into struct", func(t *testing.T) {
 		s := struct {
+			mandatory
 			Key string
 		}{
-			"",
+			Key: "",
 		}
 		cfg.v.Set("key", "value")
 		err := cfg.LoadAndUnmarshal(&cobra.Command{}, &s)
@@ -333,23 +356,20 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 
 	t.Run("returns error on incorrect struct argument", func(t *testing.T) {
 		cfg := NewNutsGlobalConfig()
-		s := struct{}{}
-		cfg.v.Set("key", "value")
+		s := struct{mandatory}{}
 		err := cfg.LoadAndUnmarshal(&cobra.Command{}, s)
 		if err == nil {
 			t.Errorf("Expected error, got nothing")
 			return
 		}
 
-		expected := "problem injecting [key]: only struct pointers are supported to be a config target"
-		if err.Error() != expected {
-			t.Errorf("Expected error [%s], got [%v]", expected, err.Error())
-		}
+		assert.Contains(t, err.Error(), "only struct pointers are supported to be a config target")
 	})
 
 	t.Run("returns error on map argument", func(t *testing.T) {
 		cfg := NewNutsGlobalConfig()
 		s := struct {
+			mandatory
 			Key map[string]string
 		}{
 			Key: make(map[string]string),
@@ -368,7 +388,7 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 	})
 
 	t.Run("returns error on unknown value", func(t *testing.T) {
-		s := struct{}{}
+		s := struct{mandatory}{}
 		cfg.v.Set("key", "value")
 		err := cfg.LoadAndUnmarshal(&cobra.Command{}, &s)
 
@@ -377,17 +397,15 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 			return
 		}
 
-		expected := "problem injecting [key]: inaccessible or invalid field [Key] in struct {}"
-		if err.Error() != expected {
-			t.Errorf("Expected error [%s], got [%v]", expected, err)
-		}
+		assert.Contains(t, err.Error(), "problem injecting [key]: inaccessible or invalid field [Key] in struct")
 	})
 
 	t.Run("returns error on inaccessible value", func(t *testing.T) {
 		s := struct {
+			mandatory
 			key string
 		}{
-			"",
+			key: "",
 		}
 		cfg.v.Set("key", "value")
 		err := cfg.LoadAndUnmarshal(&cobra.Command{}, &s)
@@ -397,10 +415,7 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 			return
 		}
 
-		expected := "problem injecting [key]: inaccessible or invalid field [Key] in struct { key string }"
-		if err.Error() != expected {
-			t.Errorf("Expected error [%s], got [%v]", expected, err)
-		}
+		assert.Contains(t, err.Error(), "problem injecting [key]: inaccessible or invalid field [Key] in struct")
 	})
 
 	t.Run("returns error on incorrect argument", func(t *testing.T) {
@@ -641,4 +656,26 @@ func TestNutsGlobalConfig_GetEngineMode(t *testing.T) {
 		c.v.Set(modeFlag, GlobalCLIMode)
 		assert.Equal(t, ServerEngineMode, c.GetEngineMode(ServerEngineMode))
 	})
+}
+
+func Test_validateIdentity(t *testing.T) {
+	type args struct {
+		identity string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"ok short", args{"urn:oid:1.3.6.1.4.1.54851.4:1"}, false},
+		{"ok long", args{"urn:oid:1.3.6.1.4.1.54851.4:123456789"}, false},
+		{"invalid", args{"invalid"}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := validateIdentity(tt.args.identity); (err != nil) != tt.wantErr {
+				t.Errorf("validateIdentity() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
 }

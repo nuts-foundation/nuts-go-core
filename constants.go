@@ -23,4 +23,7 @@ package core
 const NutsOID = "1.3.6.1.4.1.54851"
 
 // NutsConsentClassesOID is the sub-OID used for consent classification
-const NutsConsentClassesOID = "1.3.6.1.4.1.54851.1"
+const NutsConsentClassesOID = NutsOID + ".1"
+
+// NutsVendorOID is the sub-OID used for vendor identifiers
+const NutsVendorOID = NutsOID + ".4"
