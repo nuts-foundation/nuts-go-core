@@ -6,7 +6,7 @@ require (
 	github.com/deepmap/oapi-codegen v1.3.0
 	github.com/golang/mock v1.3.1
 	github.com/labstack/echo/v4 v4.1.11
-	github.com/sirupsen/logrus v1.4.2
+	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
