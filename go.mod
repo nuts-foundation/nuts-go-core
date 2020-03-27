@@ -3,7 +3,7 @@ module github.com/nuts-foundation/nuts-go-core
 go 1.13
 
 require (
-	github.com/deepmap/oapi-codegen v1.3.0
+	github.com/deepmap/oapi-codegen v1.3.6
 	github.com/golang/mock v1.3.1
 	github.com/labstack/echo/v4 v4.1.11
 	github.com/sirupsen/logrus v1.4.2
