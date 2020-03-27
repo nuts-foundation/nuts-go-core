@@ -633,6 +633,18 @@ func (mr *MockContextMockRecorder) SetHandler(arg0 interface{}) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetHandler", reflect.TypeOf((*MockContext)(nil).SetHandler), arg0)
 }
 
+// SetLogger mocks base method
+func (m *MockContext) SetLogger(arg0 v4.Logger) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "SetLogger", arg0)
+}
+
+// SetLogger indicates an expected call of SetLogger
+func (mr *MockContextMockRecorder) SetLogger(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SetLogger", reflect.TypeOf((*MockContext)(nil).SetLogger), arg0)
+}
+
 // SetParamNames mocks base method
 func (m *MockContext) SetParamNames(arg0 ...string) {
 	m.ctrl.T.Helper()

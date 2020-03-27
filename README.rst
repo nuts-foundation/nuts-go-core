@@ -3,8 +3,8 @@ nuts-go-core
 
 Common resources for Nuts Go modules.
 
-.. image:: https://travis-ci.org/nuts-foundation/nuts-go-core.svg?branch=master
-    :target: https://travis-ci.org/nuts-foundation/nuts-go-core
+.. image:: https://circleci.com/gh/nuts-foundation/nuts-go-core.svg?style=svg
+    :target: https://circleci.com/gh/nuts-foundation/nuts-go-core
     :alt: Build Status
 
 .. image:: https://codecov.io/gh/nuts-foundation/nuts-go-core/branch/master/graph/badge.svg
