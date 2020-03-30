@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/deepmap/oapi-codegen v1.3.6
 	github.com/golang/mock v1.4.3
-	github.com/labstack/echo/v4 v4.1.13
+	github.com/labstack/echo/v4 v4.1.15
 	github.com/sirupsen/logrus v1.5.0
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cobra v0.0.7
