@@ -20,11 +20,11 @@
 package core
 
 import (
-	"github.com/deepmap/oapi-codegen/pkg/runtime"
+	"net/url"
+
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"net/url"
 )
 
 // EngineCtl is the control structure where engines are registered. All registered engines are referenced by the EngineCtl
@@ -34,6 +34,19 @@ type EngineControl struct {
 }
 
 var EngineCtl EngineControl
+
+// EchoRouter is the interface the generated server API's will require as the Routes func argument
+type EchoRouter interface {
+	CONNECT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	DELETE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	GET(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	HEAD(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	OPTIONS(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	PATCH(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	POST(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	PUT(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+	TRACE(path string, h echo.HandlerFunc, m ...echo.MiddlewareFunc) *echo.Route
+}
 
 // START_DOC_ENGINE_1
 
@@ -67,7 +80,7 @@ type Engine struct {
 	FlagSet *pflag.FlagSet
 
 	// Routes passes the Echo router to the specific engine for it to register their routes.
-	Routes func(router runtime.EchoRouter)
+	Routes func(router EchoRouter)
 
 	// Shutdown the engine
 	Shutdown func() error

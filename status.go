@@ -24,7 +24,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/labstack/echo/v4"
 	"github.com/spf13/cobra"
 )
@@ -43,7 +42,7 @@ func NewStatusEngine() *Engine {
 		Diagnostics: func() []DiagnosticResult {
 			return []DiagnosticResult{diagnostics()}
 		},
-		Routes: func(router runtime.EchoRouter) {
+		Routes: func(router EchoRouter) {
 			router.GET("/status/diagnostics", diagnosticsOverview)
 			router.GET("/status", StatusOK)
 		},
