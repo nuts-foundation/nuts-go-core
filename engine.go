@@ -103,6 +103,7 @@ func DecodeURIPath(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 			newValues[i] = path
 		}
+		c.SetParamNames(c.ParamNames()...)
 		c.SetParamValues(newValues...)
 		return next(c)
 	}
