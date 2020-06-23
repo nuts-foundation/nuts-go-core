@@ -160,10 +160,10 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 	ngc.v.SetEnvKeyReplacer(strings.NewReplacer(ngc.Delimiter, "_"))
 	flagSet := pflag.NewFlagSet("config", pflag.ContinueOnError)
 	flagSet.String(configFileFlag, ngc.DefaultConfigFile, "Nuts config file")
-	flagSet.String(loggerLevelFlag, defaultLogLevel, "Log level")
+	flagSet.String(loggerLevelFlag, defaultLogLevel, "Log level (trace, debug, info, warn, error)")
 	flagSet.String(addressFlag, defaultAddress, "Address and port the server will be listening to")
 	flagSet.Bool(strictModeFlag, false, "When set, insecure settings are forbidden.")
-	flagSet.String(modeFlag, "server", "Sets the mode for the Nuts node, defaults to server mode.")
+	flagSet.String(modeFlag, "server", "Mode the application will run in. When 'cli' it can be used to administer a remote Nuts node. When 'server' it will start a Nuts node. Defaults to 'server'.")
 	flagSet.String(identityFlag, "", "Vendor identity for the node, mandatory when running in server mode. Must be in the format: urn:oid:"+ NutsVendorOID + ":<number>")
 	cmd.PersistentFlags().AddFlagSet(flagSet)
 
