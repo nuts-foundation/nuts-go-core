@@ -26,7 +26,7 @@ func printRstTable(header []rstValue, values [][]rstValue, writer io.StringWrite
 	printRow(dividers, columnLengths, writer)
 	printRow(rows[0], columnLengths, writer)
 	printRow(dividers, columnLengths, writer)
-	for i, row := range values {
+	for i, row := range rows {
 		if i == 0 {
 			// Skip headers
 			continue
