@@ -10,8 +10,9 @@ Common resources for Nuts Go modules.
 .. image:: https://codecov.io/gh/nuts-foundation/nuts-go-core/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/nuts-foundation/nuts-go-core
 
-.. image:: https://api.codacy.com/project/badge/Grade/52505af856204732ba9fc5b0d4cbe71e
-    :target: https://www.codacy.com/app/woutslakhorst/nuts-go-core
+.. image:: https://api.codeclimate.com/v1/badges/641734b46b0950436e39/maintainability
+   :target: https://codeclimate.com/github/nuts-foundation/nuts-go-core/maintainability
+   :alt: Maintainability
 
 Building
 ------------
