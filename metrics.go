@@ -20,16 +20,12 @@
 package core
 
 import (
-	"fmt"
-	"regexp"
-	"strings"
-
 	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
-const nutsMetricsPrefix = "nuts_"
+const NutsMetricsPrefix = "nuts_"
 
 // NewMetricsEngine creates a new Engine for exposing prometheus metrics via http.
 // Metrics are exposed on /metrics, by default the GoCollector and ProcessCollector are enabled.
@@ -43,21 +39,9 @@ func NewMetricsEngine() *Engine {
 	}
 }
 
-var nutsRegistry prometheus.Registerer
-
-// Registerer returns a prometheus register with the engine name added as prefix. The nuts_ prefix has also been added.
-func Registerer(engine *Engine) prometheus.Registerer {
-	var regex = regexp.MustCompile(`\s+`)
-	var engineName = regex.ReplaceAllString(engine.Name, "_")
-	engineName = fmt.Sprintf("%s_", strings.ToLower(engineName))
-
-	return prometheus.WrapRegistererWithPrefix(engineName, nutsRegistry)
-}
-
 func configure() error {
-	nutsRegistry = prometheus.WrapRegistererWithPrefix(nutsMetricsPrefix, prometheus.NewRegistry())
-	nutsRegistry.MustRegister(prometheus.NewGoCollector())
-	nutsRegistry.MustRegister(prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{}))
+	prometheus.MustRegister(prometheus.NewGoCollector())
+	prometheus.MustRegister(prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{}))
 
 	return nil
 }
