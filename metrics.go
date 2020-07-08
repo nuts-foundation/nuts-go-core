@@ -1,6 +1,6 @@
 /*
  * Nuts go core
- * Copyright (C) 2019 Nuts community
+ * Copyright (C) 2020 Nuts community
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,8 +31,8 @@ import (
 
 const nutsMetricsPrefix = "nuts_"
 
-//NewMetricsEngine creates a new Engine for exposing prometheus metrics via http.
-//Metrics are exposed on /metrics, by default the GoCollector and ProcessCollector are enabled.
+// NewMetricsEngine creates a new Engine for exposing prometheus metrics via http.
+// Metrics are exposed on /metrics, by default the GoCollector and ProcessCollector are enabled.
 func NewMetricsEngine() *Engine {
 	return &Engine{
 		Name:      "Metrics",
