@@ -27,9 +27,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/labstack/echo/v4"
-
 	"github.com/golang/mock/gomock"
+	"github.com/labstack/echo/v4"
 	"github.com/nuts-foundation/nuts-go-core/mock"
 	"github.com/stretchr/testify/assert"
 )
@@ -84,12 +83,13 @@ func TestNewStatusEngine_Cmd(t *testing.T) {
 func TestNewStatusEngine_Diagnostics(t *testing.T) {
 	RegisterEngine(NewStatusEngine())
 	RegisterEngine(NewLoggerEngine())
+	RegisterEngine(NewMetricsEngine())
 
 	t.Run("diagnostics() returns engine list", func(t *testing.T) {
 		ds := NewStatusEngine().Diagnostics()
 		assert.Len(t, ds, 1)
 		assert.Equal(t, "Registered engines", ds[0].Name())
-		assert.Equal(t, "Status,Logging", ds[0].String())
+		assert.Equal(t, "Status,Logging,Metrics", ds[0].String())
 	})
 
 	t.Run("diagnosticsOverview() renders text output of diagnostics", func(t *testing.T) {
@@ -97,7 +97,7 @@ func TestNewStatusEngine_Diagnostics(t *testing.T) {
 		defer ctrl.Finish()
 		echo := mock.NewMockContext(ctrl)
 
-		echo.EXPECT().String(http.StatusOK, "Status\n\tRegistered engines: Status,Logging\nLogging\n\tverbosity: ")
+		echo.EXPECT().String(http.StatusOK, "Status\n\tRegistered engines: Status,Logging,Metrics\nLogging\n\tverbosity: ")
 
 		diagnosticsOverview(echo)
 	})
