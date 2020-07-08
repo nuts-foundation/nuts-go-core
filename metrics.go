@@ -20,8 +20,6 @@
 package core
 
 import (
-	"errors"
-
 	"github.com/labstack/echo/v4"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -42,11 +40,17 @@ func NewMetricsEngine() *Engine {
 }
 
 func configure() error {
-	if err := prometheus.Register(prometheus.NewGoCollector()); !errors.Is(err, prometheus.AlreadyRegisteredError{}) {
-		return err
+	collectors := []prometheus.Collector{
+		prometheus.NewGoCollector(),
+		prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{}),
 	}
-	if err := prometheus.Register(prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{})); !errors.Is(err, prometheus.AlreadyRegisteredError{}) {
-		return err
+
+	are := prometheus.AlreadyRegisteredError{}
+
+	for _, c := range collectors {
+		if err := prometheus.Register(c); err != nil && err.Error() != are.Error() {
+			return err
+		}
 	}
 
 	return nil

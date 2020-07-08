@@ -54,4 +54,10 @@ func TestNewMetricsEngine(t *testing.T) {
 		assert.True(t, strings.Contains(bodyString, "go_threads"))
 		assert.True(t, strings.Contains(bodyString, "promhttp_metric_handler_requests_in_flight"))
 	})
+
+	t.Run("calling configure twice is ok", func(t *testing.T) {
+		err := mEngine.Configure()
+
+		assert.NoError(t, err)
+	})
 }
