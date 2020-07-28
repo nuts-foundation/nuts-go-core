@@ -1,6 +1,7 @@
 package core
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"regexp"
@@ -18,13 +19,16 @@ type PartyID struct {
 }
 
 // MarshalJSON marshals the PartyID to JSON.
-func (i *PartyID) MarshalJSON() ([]byte, error) {
-	return []byte(i.String()), nil
+func (i PartyID) MarshalJSON() ([]byte, error) {
+	return json.Marshal(i.String())
 }
 
 // MarshalJSON unmarshals the PartyID from JSON.
 func (i *PartyID) UnmarshalJSON(bytes []byte) error {
-	str := string(bytes)
+	var str string
+	if err := json.Unmarshal(bytes, &str); err != nil {
+		return err
+	}
 	if str == "" {
 		*i = PartyID{}
 		return nil
@@ -74,4 +78,9 @@ func (i PartyID) String() string {
 // Value returns the value part of the PartyID.
 func (i PartyID) Value() string {
 	return i.value
+}
+
+// OID returns the OID of the PartyID
+func (i PartyID) OID() string {
+	return i.oid
 }

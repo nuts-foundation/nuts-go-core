@@ -657,25 +657,3 @@ func TestNutsGlobalConfig_GetEngineMode(t *testing.T) {
 		assert.Equal(t, ServerEngineMode, c.GetEngineMode(ServerEngineMode))
 	})
 }
-
-func Test_validateIdentity(t *testing.T) {
-	type args struct {
-		identity string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{"ok short", args{"urn:oid:1.3.6.1.4.1.54851.4:1"}, false},
-		{"ok long", args{"urn:oid:1.3.6.1.4.1.54851.4:123456789"}, false},
-		{"invalid", args{"invalid"}, true},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := validateIdentity(tt.args.identity); (err != nil) != tt.wantErr {
-				t.Errorf("validateIdentity() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
