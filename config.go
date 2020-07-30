@@ -25,7 +25,6 @@ import (
 	"math"
 	"os"
 	"reflect"
-	"regexp"
 	"strings"
 	"sync"
 
@@ -49,6 +48,9 @@ const identityFlag = "identity"
 
 var defaultIgnoredPrefixes = []string{"root"}
 
+// Make sure NutsGlobalConfig implements NutConfigValues interface
+var _ NutsConfigValues = (*NutsGlobalConfig)(nil)
+
 // NutsGlobalConfig has the settings which influence all other settings.
 type NutsGlobalConfig struct {
 	// The default config file the configuration looks for (Default nuts.yaml)
@@ -71,10 +73,14 @@ type NutsConfigValues interface {
 	ServerAddress() string
 	InStrictMode() bool
 	Mode() string
+	// Identity returns the current vendor node's identity.
+	//
+	// Deprecated: use VendorID()
 	Identity() string
+	// VendorID returns the current node's identity
+	VendorID() PartyID
 	GetEngineMode(engineMode string) string
 }
-
 
 const (
 	// ServerEngineMode is used for starting a node's engine in server mode
@@ -131,10 +137,30 @@ func (ngc NutsGlobalConfig) Mode() string {
 	return ngc.v.GetString(modeFlag)
 }
 
-// Identity returns the identity. This is a mandatory parameter which must be in the following form:
+// Identity returns the current vendor's identity. This is a mandatory parameter which must be in the following form:
 // urn:oid:1.3.6.1.4.1.54851.4:<number>
+//
+// Deprecated: use VendorID() instead
 func (ngc NutsGlobalConfig) Identity() string {
-	return ngc.v.GetString(identityFlag)
+	return ngc.VendorID().String()
+}
+
+// VendorID returns the current vendor's identity.
+func (ngc NutsGlobalConfig) VendorID() PartyID {
+	if vendorID, err := ngc.tryGetVendorID(); err != nil {
+		// This should never happen, since NUTS_IDENTITY was validated earlier.
+		panic(err)
+	} else {
+		return vendorID
+	}
+}
+
+func (ngc NutsGlobalConfig) tryGetVendorID() (PartyID, error) {
+	identity := ngc.v.GetString(identityFlag)
+	if strings.TrimSpace(identity) == "" {
+		return PartyID{}, nil
+	}
+	return ParsePartyID(identity)
 }
 
 // GetEngineMode configures an engine mode if not already configured. If the application is started in 'cli' mode,
@@ -164,7 +190,7 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 	flagSet.String(addressFlag, defaultAddress, "Address and port the server will be listening to")
 	flagSet.Bool(strictModeFlag, false, "When set, insecure settings are forbidden.")
 	flagSet.String(modeFlag, "server", "Mode the application will run in. When 'cli' it can be used to administer a remote Nuts node. When 'server' it will start a Nuts node. Defaults to 'server'.")
-	flagSet.String(identityFlag, "", "Vendor identity for the node, mandatory when running in server mode. Must be in the format: urn:oid:"+ NutsVendorOID + ":<number>")
+	flagSet.String(identityFlag, "", "Vendor identity for the node, mandatory when running in server mode. Must be in the format: urn:oid:"+NutsVendorOID+":<number>")
 	cmd.PersistentFlags().AddFlagSet(flagSet)
 
 	// Bind config flag
@@ -203,27 +229,18 @@ func (ngc *NutsGlobalConfig) Load(cmd *cobra.Command) error {
 
 	// Validate identity
 	if ngc.Mode() == GlobalServerMode {
-		identity := ngc.Identity()
-		if identity == "" {
+		vendorID, err := ngc.tryGetVendorID()
+		if err != nil {
+			return fmt.Errorf("identity is invalid: %w", err)
+		}
+		if vendorID.IsZero() {
 			return fmt.Errorf("identity not configured (either through %s or %s env variable)", ngc.DefaultConfigFile, ngc.Prefix+"_IDENTITY")
 		}
-		if err := validateIdentity(identity); err != nil {
-			return err
+		if vendorID.OID() != NutsVendorOID {
+			return fmt.Errorf("identity (%s) has invalid OID (should be %s)", vendorID, NutsVendorOID)
 		}
 	}
 
-	return nil
-}
-
-func validateIdentity(identity string) error {
-	vendorIDPattern := "urn:oid:" + strings.ReplaceAll(NutsVendorOID, ".", "\\.") + ":[0-9]+"
-	identityIsValid, err := regexp.MatchString(vendorIDPattern, identity)
-	if err != nil {
-		return err
-	}
-	if !identityIsValid {
-		return fmt.Errorf("identity is invalid (id = %s, pattern = %s)", identity, vendorIDPattern)
-	}
 	return nil
 }
 
