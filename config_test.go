@@ -330,7 +330,7 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 	}
 
 	t.Run("Adds configFile flag to Cmd", func(t *testing.T) {
-		err := cfg.LoadAndUnmarshal(&cobra.Command{}, &struct{mandatory}{})
+		err := cfg.LoadAndUnmarshal(&cobra.Command{}, &struct{ mandatory }{})
 		if assert.NoError(t, err) {
 			assert.NotEmpty(t, cfg.v.GetString(configFileFlag))
 		}
@@ -356,7 +356,7 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 
 	t.Run("returns error on incorrect struct argument", func(t *testing.T) {
 		cfg := NewNutsGlobalConfig()
-		s := struct{mandatory}{}
+		s := struct{ mandatory }{}
 		err := cfg.LoadAndUnmarshal(&cobra.Command{}, s)
 		if err == nil {
 			t.Errorf("Expected error, got nothing")
@@ -388,7 +388,7 @@ func TestNutsGlobalConfig_LoadAndUnmarshal(t *testing.T) {
 	})
 
 	t.Run("returns error on unknown value", func(t *testing.T) {
-		s := struct{mandatory}{}
+		s := struct{ mandatory }{}
 		cfg.v.Set("key", "value")
 		err := cfg.LoadAndUnmarshal(&cobra.Command{}, &s)
 
@@ -454,6 +454,29 @@ func TestNutsGlobalConfig_InjectIntoEngine(t *testing.T) {
 		}
 
 		if c.Key != "value" {
+			t.Errorf("Expected value to be injected into struct")
+		}
+	})
+
+	t.Run("slice param is injected into engine without ConfigKey", func(t *testing.T) {
+		c := struct {
+			Key []string
+		}{}
+
+		e := &Engine{
+			Config:  &c,
+			FlagSet: pflag.NewFlagSet("dummy", pflag.ContinueOnError),
+		}
+		e.FlagSet.StringArray("key", []string{""}, "")
+
+		// slices a read as []interface{}
+		cfg.v.Set("key", []interface{}{"value"})
+
+		if err := cfg.InjectIntoEngine(e); err != nil {
+			t.Errorf("Expected no error, got [%v]", err.Error())
+		}
+
+		if c.Key[0] != "value" {
 			t.Errorf("Expected value to be injected into struct")
 		}
 	})
