@@ -358,6 +358,8 @@ func (ngc *NutsGlobalConfig) InjectIntoEngine(e *Engine) error {
 					return
 				}
 
+				isStringSlice := false
+
 				// get real value with correct type
 				switch field.Kind() {
 				case reflect.Int:
@@ -370,7 +372,12 @@ func (ngc *NutsGlobalConfig) InjectIntoEngine(e *Engine) error {
 					val = ngc.v.GetString(configName)
 				case reflect.Bool:
 					val = ngc.v.GetBool(configName)
-					break
+				case reflect.Slice:
+					val = ngc.v.Get(configName)
+					valI := val.([]interface{})
+					if _, ok := valI[0].(string); ok {
+						isStringSlice = true
+					}
 				default:
 					val = ngc.v.Get(configName)
 				}
@@ -381,7 +388,16 @@ func (ngc *NutsGlobalConfig) InjectIntoEngine(e *Engine) error {
 				}
 
 				// inject value
-				field.Set(reflect.ValueOf(val))
+				if isStringSlice {
+					valI := val.([]interface{})
+					va := make([]string, len(valI))
+					for i, v := range valI {
+						va[i] = v.(string)
+					}
+					field.Set(reflect.ValueOf(va))
+				} else {
+					field.Set(reflect.ValueOf(val))
+				}
 				log.Tracef("[%s] %s=%v\n", e.Name, f.Name, val)
 			})
 		}
