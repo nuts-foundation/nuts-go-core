@@ -4,7 +4,7 @@ go 1.13
 
 require (
 	github.com/golang/mock v1.4.4
-	github.com/labstack/echo/v4 v4.1.17
+	github.com/labstack/echo/v4 v4.2.0
 	github.com/prometheus/client_golang v0.9.4
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/afero v1.2.2 // indirect
